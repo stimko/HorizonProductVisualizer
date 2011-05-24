@@ -101,18 +101,15 @@ package
 		{
 			if(!colorSwatches)
 			{
-				colorSwatches = new ColorPicker('clients.xml', false, false, 30, 30, 3, 3, 3, 3, 5, false);
+				colorSwatches = new ColorPicker('clients.xml', false, false, 30, 30, 5, 5, 8, 1, 8, false);
 				//colorSwatches.addEventListener(Event.COMPLETE, tilesReadyHandler);
 				contentHolder.addChild(colorSwatches);
 				colorSwatches.buttonMode = true;
-				colorSwatches.scaleX = .5;
-				colorSwatches.scaleY = .5;
 				colorSwatches.x = 10;
-				colorSwatches.y = 10;
+				colorSwatches.y = 350;
 			}
 			else
 				contentHolder.addChild(colorSwatches)
-			
 		}
 		
 		private function assignMainButtonHandlers():void

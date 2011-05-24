@@ -46,7 +46,7 @@ package com.sigmagroup.components
 		
 		protected var imageWidth:int;
 		protected var imageHeight:int;
-		protected var clients:XML;
+		protected var thexml:XML;
 		protected var numOfRows:int
 		protected var specifiedNumOfColumns:int;
 		protected var totalWidth:int;
@@ -57,7 +57,7 @@ package com.sigmagroup.components
 		
 		public var currentImagesContainer:Sprite;
 		
-		public function Tiler( sourceUrl:String, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int = 1, numofImagesToLoad:int = 0, displayNames:Boolean = false)
+		public function Tiler( sourceUrl:String, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int = 1, totalImages:int = 0, displayNames:Boolean = false)
 		{
 			this.sourceUrl = sourceUrl;
 			this.specifiedNumOfRows = specifiedNumOfRows;
@@ -75,7 +75,7 @@ package com.sigmagroup.components
 			this.totalWidth = imageWidth + horPadding;
 			this.totalHeight = imageHeight + vertPadding;
 			this.currentIndex = 0;
-			this.totalImages = numofImagesToLoad;
+			this.totalImages = totalImages;
 			
 			init();
 		}
@@ -94,10 +94,11 @@ package com.sigmagroup.components
 		
 		private function xmlLoaded(event:Event):void
 		{	
-			clients = new XML(event.target.data);
+			thexml = new XML(event.target.data);
+			var thexmlLength:int = thexml.client.length();
 			
-			if(totalImages==0)
-				totalImages = clients.client.length();
+			if(totalImages==0 || thexmlLength < totalImages)
+				totalImages = thexml.client.length();
 			
 			if(paginate)
 				totalPages = Math.ceil(totalImages/imagesPerPage);

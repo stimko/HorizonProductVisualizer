@@ -15,9 +15,9 @@ package
 	
 	public class SurfacesGallery extends Tiler
 	{
-		public function SurfacesGallery(sourceUrl:String, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int=1, numofImagesToLoad:int=0, displayNames:Boolean=false)
+		public function SurfacesGallery(sourceUrl:String, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int=1, totalImages:int=0, displayNames:Boolean=false)
 		{
-			super(sourceUrl, paginate, bitmap, imageWidth, imageHeight, horPadding, vertPadding, specifiedNumOfColumns, specifiedNumOfRows, numofImagesToLoad, displayNames);
+			super(sourceUrl, paginate, bitmap, imageWidth, imageHeight, horPadding, vertPadding, specifiedNumOfColumns, specifiedNumOfRows, totalImages, displayNames);
 		}
 	
 		override public function generateVoArray(maxIndex:int):Array
@@ -27,8 +27,8 @@ package
 			for (var i:int = currentIndex; i<maxIndex; i++)
 			{
 				var vo:Object = new Object;
-				vo.url = String(clients.client[i].@imageurl);
-				vo.displayName = String(clients.client[i].@name);
+				vo.url = String(thexml.client[i].@imageurl);
+				vo.displayName = String(thexml.client[i].@name);
 				voarray.push(vo);
 			}	
 			return voarray;
