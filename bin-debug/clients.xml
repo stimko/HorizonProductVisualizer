@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Root xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+<client name = "brut" size="small" hex ="000000" imageurl = "assets/images/clients/brut.jpg"/>
+<client name = "ciao bella" size="small" hex ="000000" imageurl = "assets/images/clients/ciaoBella.jpg"/>
+<client name = "delonghi" size="small" hex ="000000" imageurl = "assets/images/clients/delonghi.jpg"/>
+<client name = "famous footwear" size="small" hex ="000000" imageurl = "assets/images/clients/famousFootwear.jpg"/>
+<client name = "horizon" size="small" hex ="000000" imageurl = "assets/images/clients/horizon.jpg"/>
+<client name = "hunter douglas" size="small" hex ="000000" imageurl = "assets/images/clients/hunterdouglas.jpg"/>
+<client name = "panasonic" size="small" hex ="000000" imageurl = "assets/images/clients/panasonic.jpg"/>
+<client name = "seiko" size="small" hex ="000000" imageurl = "assets/images/clients/seiko.jpg"/>
+<client name = "siemens" size="small" hex ="000000" imageurl = "assets/images/clients/siemens.jpg"/>
+
+<client name = "waterjel" size="small" imageurl = "assets/images/clients/waterjel.jpg"/>
+<client name = "jets" size="medium" imageurl = "assets/images/clients/jets.jpg"/>
+<client name = "mastercard" size="medium" imageurl = "assets/images/clients/mastercard.jpg"/>
+<client name ="pr newswire" size="medium" imageurl = "assets/images/clients/prNewswire.jpg"/>
+<client name ="toughbook" size="medium" imageurl = "assets/images/clients/toughbook.jpg"/>
+<client name = "brut" size="medium" imageurl = "assets/images/clients/brut.jpg"/>
+<client name = "ciao bella" size="medium" imageurl = "assets/images/clients/ciaoBella.jpg"/>
+<client name = "delonghi" size="medium" imageurl = "assets/images/clients/delonghi.jpg"/>
+<client name = "famous footwear" size="medium" imageurl = "assets/images/clients/famousFootwear.jpg"/>
+
+<client name = "horizon" size="medium" imageurl = "assets/images/clients/horizon.jpg"/>
+<client name = "hunter douglas" size="medium" imageurl = "assets/images/clients/hunterdouglas.jpg"/>
+<client name = "panasonic" size="large" imageurl = "assets/images/clients/panasonic.jpg"/>
+<client name = "seiko" size="large" imageurl = "assets/images/clients/seiko.jpg"/>
+<client name = "siemens" size="large" imageurl = "assets/images/clients/siemens.jpg"/>
+<client name = "waterjel" size="large" imageurl = "assets/images/clients/waterjel.jpg"/>
+<client name = "jets" size="large" imageurl = "assets/images/clients/jets.jpg"/>
+<client name = "mastercard" size="large" imageurl = "assets/images/clients/mastercard.jpg"/>
+<client name ="pr newswire" size="large" imageurl = "assets/images/clients/prNewswire.jpg"/>
+
+<client name ="toughbook" size="large" imageurl = "assets/images/clients/toughbook.jpg"/>
+
+<button buttonurl = "assets/images/arrow.swf"/>
+
+</Root>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Root xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+<client name = "brut" imageurl = "assets/images/clients/brut.jpg"/>
+<client name = "ciao bella" imageurl = "assets/images/clients/ciaoBella.jpg"/>
+<client name = "delonghi" imageurl = "assets/images/clients/delonghi.jpg"/>
+<client name = "famous footwear" imageurl = "assets/images/clients/famousFootwear.jpg"/>
+<client name = "horizon" imageurl = "assets/images/clients/horizon.jpg"/>
+<client name = "hunter douglas" imageurl = "assets/images/clients/hunterdouglas.jpg"/>
+<client name = "panasonic" imageurl = "assets/images/clients/panasonic.jpg"/>
+<client name = "seiko" imageurl = "assets/images/clients/seiko.jpg"/>
+<client name = "siemens" imageurl = "assets/images/clients/siemens.jpg"/>
+<client name = "waterjel" imageurl = "assets/images/clients/waterjel.jpg"/>
+<client name = "jets" imageurl = "assets/images/clients/jets.jpg"/>
+<client name = "mastercard" imageurl = "assets/images/clients/mastercard.jpg"/>
+<client name ="pr newswire" imageurl = "assets/images/clients/prNewswire.jpg"/>
+<client name ="toughbook" imageurl = "assets/images/clients/toughbook.jpg"/>
+<client name = "brut" imageurl = "assets/images/clients/brut.jpg"/>
+<client name = "ciao bella" imageurl = "assets/images/clients/ciaoBella.jpg"/>
+<client name = "delonghi" imageurl = "assets/images/clients/delonghi.jpg"/>
+<client name = "famous footwear" imageurl = "assets/images/clients/famousFootwear.jpg"/>
+<client name = "horizon" imageurl = "assets/images/clients/horizon.jpg"/>
+<client name = "hunter douglas" imageurl = "assets/images/clients/hunterdouglas.jpg"/>
+<client name = "panasonic" imageurl = "assets/images/clients/panasonic.jpg"/>
+<client name = "seiko" imageurl = "assets/images/clients/seiko.jpg"/>
+<client name = "siemens" imageurl = "assets/images/clients/siemens.jpg"/>
+<client name = "waterjel" imageurl = "assets/images/clients/waterjel.jpg"/>
+<client name = "jets" imageurl = "assets/images/clients/jets.jpg"/>
+<client name = "mastercard" imageurl = "assets/images/clients/mastercard.jpg"/>
+<client name ="pr newswire" imageurl = "assets/images/clients/prNewswire.jpg"/>
+<client name ="toughbook" imageurl = "assets/images/clients/toughbook.jpg"/>
+
+<button buttonurl = "assets/images/arrow.swf"/>
+
+</Root>
