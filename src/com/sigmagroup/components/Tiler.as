@@ -26,13 +26,11 @@ package com.sigmagroup.components
 	
 	public class Tiler extends Sprite
 	{
-		private var sourceUrl:String;
 		private var specifiedNumOfRows:int;
 		private var imagesPerPage:int;
 		private var tilesLoaded:int;
 		private var horPadding:int;
 		private var vertPadding:int;
-		private var totalImages:int;
 		private var totalPages:int = 1;
 		private var numberOfImagesToLoadNext:int;
 		private var currentPage:int = 1;
@@ -44,22 +42,23 @@ package com.sigmagroup.components
 		private var displayNames:Boolean;
 		private var pageVosReference:Array = new Array();
 		
+		protected var totalImages:int;
+		protected var theXML:XML;
 		protected var imageWidth:int;
 		protected var imageHeight:int;
-		protected var thexml:XML;
 		protected var numOfRows:int
 		protected var specifiedNumOfColumns:int;
 		protected var totalWidth:int;
 		protected var totalHeight:int;
 		protected var currentIndex:int;
 		protected var currentPageVosReference:Array = new Array();
-		protected var initiateDisplayFunction:Function = loadPage;
+		protected var initiateDisplayFunction:Function;
 		
 		public var currentImagesContainer:Sprite;
 		
-		public function Tiler( sourceUrl:String, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int = 1, totalImages:int = 0, displayNames:Boolean = false)
+		public function Tiler( theXML:XML, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int = 1, totalImages:int = 0, displayNames:Boolean = false)
 		{
-			this.sourceUrl = sourceUrl;
+			this.theXML = theXML;
 			this.specifiedNumOfRows = specifiedNumOfRows;
 			this.specifiedNumOfColumns = specifiedNumOfColumns;
 			this.imageWidth = imageWidth;
@@ -81,24 +80,8 @@ package com.sigmagroup.components
 		}
 		
 		private function init():void
-		{
-			loadTheXml();
-		}
-		
-		private function loadTheXml():void
-		{
-			var loader:URLLoader = new URLLoader();
-			loader.addEventListener(Event.COMPLETE, xmlLoaded);
-			loader.load(new URLRequest(sourceUrl));
-		}
-		
-		private function xmlLoaded(event:Event):void
 		{	
-			thexml = new XML(event.target.data);
-			var thexmlLength:int = thexml.client.length();
-			
-			if(totalImages==0 || thexmlLength < totalImages)
-				totalImages = thexml.client.length();
+			checkXmlLength();
 			
 			if(paginate)
 				totalPages = Math.ceil(totalImages/imagesPerPage);
@@ -147,6 +130,8 @@ package com.sigmagroup.components
 				initiateDisplay();
 			}
 		}
+		
+		private function initiateDisplay():void{initiateDisplayFunction()};
 		
 		private function createPageNumber(pageNumber:int):void
 		{
@@ -226,7 +211,7 @@ package com.sigmagroup.components
 			return tf;
 		}
 		
-		private function loadPage():void
+		protected function loadPage():void
 		{	
 			imageLoaders = new Vector.<Loader>;
 			numberOfImagesToLoadNext = currentPageVosReference.length;
@@ -247,8 +232,12 @@ package com.sigmagroup.components
 		}
 		
 		//POSSIBLY OVERIDDEN METHODS
-		public function initiateDisplay():void{initiateDisplayFunction();};
-		public function generateVoArray(maxIndex:int):Array{ return new Array()};
+		public function generateVoArray(maxIndex:int):Array{return new Array()};
+		public function imageOverHandler(event:MouseEvent):void{};
+		public function imageOutHandler(event:MouseEvent):void{};
+		public function imageDownHandler(event:MouseEvent):void{};
+		public function checkXmlLength():void{};
+		
 		public function createBorder(color:uint):DisplayObject
 		{
 			var border:Shape = new Shape();
@@ -258,16 +247,6 @@ package com.sigmagroup.components
 			return border;
 		}
 		
-		public function imageOverHandler(event:MouseEvent):void
-		{
-			event.currentTarget.addChild(createBorder(0x9E9C9A));	
-		}
-		
-		public function imageOutHandler(event:MouseEvent):void
-		{
-			var currentImage:Sprite = event.currentTarget as Sprite;
-			currentImage.removeChild(currentImage.getChildAt(currentImage.numChildren-1));	
-		}
 		public function animateTiles():void
 		{
 			var currentBitmapData:BitmapData;
@@ -308,6 +287,7 @@ package com.sigmagroup.components
 					currentImageHolder.addChild(createBorder(0xCEA97B))
 					currentImageHolder.addEventListener(MouseEvent.MOUSE_OVER, imageOverHandler);
 					currentImageHolder.addEventListener(MouseEvent.MOUSE_OUT, imageOutHandler);
+					currentImageHolder.addEventListener(MouseEvent.MOUSE_DOWN, imageDownHandler);
 					currentImagesContainer.addChild(currentImageHolder);
 					TweenLite.to(currentImageHolder,1, {alpha:1, delay:(.075*imageNumber)});
 					imageNumber++;
@@ -315,6 +295,5 @@ package com.sigmagroup.components
 			}
 			dispatchEvent(new Event(Event.COMPLETE));
 		}
-		
 	}
 }

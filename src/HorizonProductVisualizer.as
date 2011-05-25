@@ -6,6 +6,9 @@ package
 	import com.sigmagroup.components.AssetLoader;
 	import com.sigmagroup.components.Tiler;
 	
+	import fl.controls.ComboBox;
+	import fl.data.DataProvider;
+	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.Loader;
@@ -23,12 +26,13 @@ package
 	import flash.net.URLVariables;
 	import flash.ui.Mouse;
 	import flash.utils.ByteArray;
+	import flash.xml.XMLNode;
 	
 	[SWF(width='902', height='515', backgroundColor='#ffffff', frameRate='30')]
 	
 	public class HorizonProductVisualizer extends Sprite
 	{
-		private var surfacesGallery:Tiler;
+		private var surfacesGallery:SurfacesGallery;
 		private var productsGallery:Tiler;
 		private var colorSwatches:Tiler;
 		private var bitmapContainer:Sprite;
@@ -39,6 +43,15 @@ package
 		private var sendtofriendButton:sendtofriendbutton;
 		private var snapshotBitmapData:BitmapData;
 		private var urlVars:URLVariables;
+		private var cBox:ComboBox = new ComboBox();
+		
+		private var swatchesXml:XML;
+		private var surfacesXml:XML;
+		private var productsXml:XML;
+		private var xmlLoader:XmlLoader;
+		
+		private var currentSurface:int = -1;
+		private var colorSwatchesXmlReference:Array = new Array();
 		
 		public function HorizonProductVisualizer()
 		{
@@ -57,22 +70,8 @@ package
 			addChild(shellmc);
 			assignMainButtonHandlers();
 			assignCurrentButton(shellmc.buttons.SelectASurfaceButton);
-			displaySurfaceChoices();
+			initSurfacesGallery();
 			addChild(contentHolder);
-		}
-		
-		private function displaySurfaceChoices():void
-		{
-			if(!surfacesGallery)
-			{
-				surfacesGallery = new SurfacesGallery('clients.xml',false, true, 154, 125, 10, 10, 5, 1, 5, true);
-				contentHolder.addChild(surfacesGallery);
-				surfacesGallery.buttonMode = true;
-				surfacesGallery.x = 45;
-				surfacesGallery.y = 100;
-			}
-			else
-				contentHolder.addChild(surfacesGallery);
 		}
 		
 		private function tilesReadyHandler(event:Event):void
@@ -80,11 +79,27 @@ package
 			productsGallery.currentImagesContainer.addEventListener(MouseEvent.MOUSE_DOWN, mouseDownHandler);
 		}
 		
+		private function initProductsGallery():void
+		{
+			if(!productsXml)
+				loadProductsXml('clients.xml');
+			else
+				createProductsGallery();
+		}
+		
+		private function initSurfacesGallery():void
+		{
+			if(!surfacesXml)
+				loadSurfacesXml('surfaces.xml');
+			else
+				createSurfacesGallery();
+		}
+		
 		private function createProductsGallery():void
 		{
 			if(!productsGallery)
 			{
-				productsGallery = new ProductsGallery('clients.xml', true, true, 154, 125, 3, 3, 3, 3, 0, false);
+				productsGallery = new ProductsGallery(productsXml, true, true, 154, 125, 3, 3, 3, 3, 0, false);
 				productsGallery.addEventListener(Event.COMPLETE, tilesReadyHandler);
 				contentHolder.addChild(productsGallery);
 				productsGallery.buttonMode = true;
@@ -92,16 +107,53 @@ package
 				productsGallery.scaleY = .5;
 				productsGallery.x = 600;
 				productsGallery.y = 100;
+				
+/*				var dummyarray:Array = ['hello', 'hi', 'shark'];
+				var dp:DataProvider = new DataProvider(dummyarray);
+				cBox.dataProvider = dp;
+				cBox.x = 200;
+				cBox.y = 200;
+				cBox.addEventListener(Event.CHANGE, displayDifferentCategory);
+				contentHolder.addChild(cBox);*/
 			}
 			else
-				contentHolder.addChild(productsGallery);
+				displayTheProductsGallery();	
+		}
+		
+		private function displayTheProductsGallery():void
+		{
+			contentHolder.addChild(productsGallery);
+			//contentHolder.addChild(cBox);
+		}
+		
+		private function displayDifferentCategory(event:Event):void
+		{
+			trace(event.currentTarget.selectedIndex);
+			
+		}
+		
+		private function createSurfacesGallery():void
+		{
+			if(!surfacesGallery)
+			{
+				surfacesGallery = new SurfacesGallery(surfacesXml, false, true, 154, 125, 10, 10, 5, 1, 5, true);
+				contentHolder.addChild(surfacesGallery);
+				surfacesGallery.buttonMode = true;
+				surfacesGallery.x = 45;
+				surfacesGallery.y = 100;
+			}
+			else
+				contentHolder.addChild(surfacesGallery);	
 		}
 		
 		private function createColorSwatches():void
 		{
-			if(!colorSwatches)
-			{
-				colorSwatches = new ColorPicker('clients.xml', false, false, 30, 30, 5, 5, 8, 1, 8, false);
+			if(currentSurface != surfacesGallery.currentSurface)
+			{				
+				currentSurface = surfacesGallery.currentSurface
+				var currentSurfaceXML:XML = colorSwatchesXmlReference[currentSurface];
+				
+				colorSwatches = new ColorPicker(currentSurfaceXML, false, false, 30, 30, 5, 5, 8, 1, 8, false);
 				//colorSwatches.addEventListener(Event.COMPLETE, tilesReadyHandler);
 				contentHolder.addChild(colorSwatches);
 				colorSwatches.buttonMode = true;
@@ -152,10 +204,10 @@ package
 			
 			switch(name){
 				case "SelectASurfaceButton":
-					displaySurfaceChoices();
+					initSurfacesGallery();
 					break;
 				case "DesignAndDecorateButton":
-					createProductsGallery();
+					initProductsGallery();
 					createColorSwatches();
 					break;
 				case "SaveAndShareButton":
@@ -257,7 +309,7 @@ package
 				contentHolder.addChild(sendtofriendButton);
 		}
 		
-		//util methods
+		//UTILS//
 		private function saveimagetodesktop(e:Object):void
 		{
 			snapshotBitmapData = new BitmapData(500, 500);
@@ -289,7 +341,6 @@ package
 			varLoader.load(varSend);
 		}
 		
-		
 		private function copyBitmapData(bitmap:Bitmap):Bitmap
 		{
 			var copyBitmapData:BitmapData = bitmap.bitmapData;	
@@ -317,6 +368,45 @@ package
 					break;
 			}
 			return ratio;
+		}
+		
+		private function loadSurfacesXml(url:String):void
+		{
+			xmlLoader = new XmlLoader(url);
+			xmlLoader.addEventListener(Event.COMPLETE, surfacesXmlLoaded);
+		}
+		
+		private function surfacesXmlLoaded(event:Event):void{
+			surfacesXml = xmlLoader.content;
+			createSurfacesGallery();
+			generateSwatchesXmlReference();
+		}
+		
+		private function loadProductsXml(url:String):void
+		{
+			xmlLoader = new XmlLoader(url);
+			xmlLoader.addEventListener(Event.COMPLETE, productsXmlLoaded);
+		}
+		
+		private function productsXmlLoaded(event:Event):void
+		{
+			productsXml = xmlLoader.content;
+			createProductsGallery();
+		}
+		
+		private function generateSwatchesXmlReference():void
+		{
+			var surfacesLength:int = surfacesXml.surface.length();	
+			
+			for (var i:int = 0; i<surfacesLength; i++)
+			{
+				var item:XMLList = surfacesXml.surface[i].item;
+				var xmlString:String =item.toXMLString();
+				xmlString = '<items>' + xmlString + '</items>';
+				var newXML:XML = new XML(xmlString);
+				
+				colorSwatchesXmlReference.push(newXML);
+			}
 		}
 	}
 }

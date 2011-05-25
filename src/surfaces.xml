@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Root xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<surface name="jeans" id="29">
+<item imagesrc="images/darth-on-cat.jpg" hex="223455" name="Test 1" id="1"/>
+<item imagesrc="images/featureditem-homepgbg.png" hex="666666" name="test2" id="2"/>
+</surface>
+<surface name="Shirt" id="31">
+<item imagesrc="images/visualizer/surfaces/tshirt.jpg" hex="000000" name="blue" id="3"/>
+</surface>
+</Root>

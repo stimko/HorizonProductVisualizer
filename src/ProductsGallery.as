@@ -12,9 +12,18 @@ package
 	
 	public class ProductsGallery extends Tiler
 	{
-		public function ProductsGallery(sourceUrl:String, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int=1, totalImages:int=0, displayNames:Boolean = false)
+		public function ProductsGallery(theXML:XML, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int=1, totalImages:int=0, displayNames:Boolean = false)
 		{
-			super(sourceUrl, paginate, bitmap, imageWidth, imageHeight, horPadding, vertPadding, specifiedNumOfColumns, specifiedNumOfRows, totalImages, displayNames);
+			initiateDisplayFunction = loadPage;
+			super(theXML, paginate, bitmap, imageWidth, imageHeight, horPadding, vertPadding, specifiedNumOfColumns, specifiedNumOfRows, totalImages, displayNames);
+		}
+		
+		override public function checkXmlLength():void
+		{
+			var thexmlLength:int = theXML.client.length();
+			
+			if(totalImages==0 || thexmlLength < totalImages)
+				totalImages = theXML.client.length();
 		}
 	
 		override public function generateVoArray(maxIndex:int):Array
@@ -24,11 +33,22 @@ package
 			for (var i:int = currentIndex; i<maxIndex; i++)
 			{
 				var vo:Object = new Object;
-				vo.url = String(thexml.client[i].@imageurl);
-				vo.size = String(thexml.client[i].@size);	
+				vo.url = String(theXML.client[i].@imageurl);
+				vo.size = String(theXML.client[i].@size);	
 				voarray.push(vo);
 			}	
 			return voarray;
+		}
+		
+		override public function imageOverHandler(event:MouseEvent):void
+		{
+			event.currentTarget.addChild(createBorder(0x9E9C9A));	
+		}
+		
+		override public function imageOutHandler(event:MouseEvent):void
+		{
+			var currentImage:Sprite = event.currentTarget as Sprite;
+			currentImage.removeChild(currentImage.getChildAt(currentImage.numChildren-1));	
 		}
 	}
 }

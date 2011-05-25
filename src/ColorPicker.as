@@ -12,12 +12,19 @@ package
 	
 	public class ColorPicker extends Tiler
 	{
-		public function ColorPicker(sourceUrl:String, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int=1, totalImages:int=0, displayNames:Boolean=false)
+		public function ColorPicker(theXML:XML, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int=1, totalImages:int=0, displayNames:Boolean=false)
 		{
-			super(sourceUrl, paginate, bitmap, imageWidth, imageHeight, horPadding, vertPadding, specifiedNumOfColumns, specifiedNumOfRows, totalImages, displayNames);
 			initiateDisplayFunction = animateTiles;
+			super(theXML, paginate, bitmap, imageWidth, imageHeight, horPadding, vertPadding, specifiedNumOfColumns, specifiedNumOfRows, totalImages, displayNames);
 		}
-	
+		
+		override public function checkXmlLength():void{
+			var thexmlLength:int = theXML.item.length();
+			
+			if(totalImages==0 || thexmlLength < totalImages)
+				totalImages = theXML.item.length();
+		};
+		
 		override public function generateVoArray(maxIndex:int):Array
 		{
 			var voarray:Array = new Array;
@@ -25,8 +32,8 @@ package
 			for (var i:int = currentIndex; i<maxIndex; i++)
 			{
 				var vo:Object = new Object;
-				vo.url = String(thexml.client[i].@imageurl);
-				vo.hex = String(thexml.client[i].@hex);
+				//vo.url = String(theXML.item[i].@imageurl);
+				vo.hex = String(theXML.item[i].@hex);
 				voarray.push(vo);
 			}	
 			return voarray;
