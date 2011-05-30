@@ -16,7 +16,6 @@ package com.sigmagroup.components
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
-	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
@@ -37,13 +36,16 @@ package com.sigmagroup.components
 		private var reachedTheEnd:Boolean = false;
 		private var bitmap:Boolean;
 		private var paginate:Boolean;
-		private var namesReference:Array = new Array();
 		private var imageLoaders:Vector.<Loader>;
 		private var displayNames:Boolean;
 		private var pageVosReference:Array = new Array();
+		private var vos:Vector.<Object> = new Vector.<Object>;
+		protected var scale:Number;
 		
+		public var currentSelected:int;
+		
+		protected var currentVO:Object;
 		protected var totalImages:int;
-		protected var theXML:XML;
 		protected var imageWidth:int;
 		protected var imageHeight:int;
 		protected var numOfRows:int
@@ -51,14 +53,13 @@ package com.sigmagroup.components
 		protected var totalWidth:int;
 		protected var totalHeight:int;
 		protected var currentIndex:int;
-		protected var currentPageVosReference:Array = new Array();
+		protected var currentPageVosReference:Vector.<Object> = new Vector.<Object>();
 		protected var initiateDisplayFunction:Function;
 		
-		public var currentImagesContainer:Sprite;
+		protected var currentImagesContainer:Sprite;
 		
-		public function Tiler( theXML:XML, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int = 1, totalImages:int = 0, displayNames:Boolean = false)
+		public function Tiler( vos:Vector.<Object>, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int = 1, totalImages:int = 0, displayNames:Boolean = false, scale:Number = 1)
 		{
-			this.theXML = theXML;
 			this.specifiedNumOfRows = specifiedNumOfRows;
 			this.specifiedNumOfColumns = specifiedNumOfColumns;
 			this.imageWidth = imageWidth;
@@ -68,6 +69,8 @@ package com.sigmagroup.components
 			this.paginate = paginate;
 			this.bitmap = bitmap;
 			this.displayNames = displayNames;
+			this.scale = scale;
+			this.vos = vos;
 			
 			this.numOfRows = this.specifiedNumOfRows;
 			this.imagesPerPage = specifiedNumOfRows * specifiedNumOfColumns;
@@ -81,12 +84,20 @@ package com.sigmagroup.components
 		
 		private function init():void
 		{	
-			checkXmlLength();
+			checkAmountOfVos();
 			
 			if(paginate)
 				totalPages = Math.ceil(totalImages/imagesPerPage);
 			
 			setupPages();	
+		}
+		
+		private function checkAmountOfVos():void
+		{
+			var amountVOs:int = vos.length;
+			
+			if(totalImages==0 || amountVOs < totalImages)
+				totalImages = amountVOs;
 		}
 		
 		private function setupPages():void
@@ -101,7 +112,7 @@ package com.sigmagroup.components
 		}
 		
 		private function generatePageVosReference(pageNumber:int):void {
-			var voarray:Array = new Array;
+			var voarray:Vector.<Object> = new Vector.<Object>;
 			var maxIndex:int;
 			
 			if(pageNumber != totalPages)
@@ -127,11 +138,21 @@ package com.sigmagroup.components
 			if(reachedTheEnd)
 			{
 				currentPageVosReference = pageVosReference[1];
-				initiateDisplay();
+				initiateDisplayFunction();
 			}
 		}
 		
-		private function initiateDisplay():void{initiateDisplayFunction()};
+		private function generateVoArray(maxIndex:int):Vector.<Object>
+		{
+			var voarray:Vector.<Object> = new Vector.<Object>;
+			
+			for (var i:int = currentIndex; i<maxIndex; i++)
+			{
+				var currentVO:Object = vos[i];
+				voarray.push(currentVO);
+			}	
+			return voarray;
+		}
 		
 		private function createPageNumber(pageNumber:int):void
 		{
@@ -144,7 +165,7 @@ package com.sigmagroup.components
 			
 			var myFormat:TextFormat = new TextFormat();  
 			myFormat.color = 0xAA0000; 
-			myFormat.size = 24;  
+			myFormat.size = 16;  
 			myFormat.italic = true;  
 			tf.setTextFormat(myFormat);
 			
@@ -211,6 +232,12 @@ package com.sigmagroup.components
 			return tf;
 		}
 		
+		protected function imageDownHandler(event:MouseEvent):void
+		{
+			currentSelected = currentImagesContainer.getChildIndex(event.currentTarget as Sprite);
+			currentVO = currentPageVosReference[currentSelected];
+		}
+		
 		protected function loadPage():void
 		{	
 			imageLoaders = new Vector.<Loader>;
@@ -226,16 +253,16 @@ package com.sigmagroup.components
 			}
 		}
 		
-		public function getSize(imageNumber:int):String
+		public function reAnimate():void
 		{
-			return currentPageVosReference[imageNumber].size;
+			removeChild(currentImagesContainer);
+			animateTiles();
 		}
 		
 		//POSSIBLY OVERIDDEN METHODS
-		public function generateVoArray(maxIndex:int):Array{return new Array()};
 		public function imageOverHandler(event:MouseEvent):void{};
 		public function imageOutHandler(event:MouseEvent):void{};
-		public function imageDownHandler(event:MouseEvent):void{};
+
 		public function checkXmlLength():void{};
 		
 		public function createBorder(color:uint):DisplayObject
@@ -263,7 +290,7 @@ package com.sigmagroup.components
 			
 			for(var i:int = 1; i<=numOfRows; i++)
 			{
-				currentY = (i-1)*totalHeight;
+				currentY = (i-1)*(totalHeight*scale);
 				var tileDifference:int = (i*specifiedNumOfColumns) - numberOfImagesToAnimate;
 				
 				if(tileDifference > 0)
@@ -281,12 +308,14 @@ package com.sigmagroup.components
 					currentBitmap.smoothing = true;
 					currentImageHolder.addChild(currentBitmap);
 					currentImageHolder.alpha = 0;
-					currentImageHolder.x = a*totalWidth;
+					currentImageHolder.x = a*(totalWidth * scale);
 					currentImageHolder.y = currentY;
 					currentImageHolder.buttonMode = true;
-					currentImageHolder.addChild(createBorder(0xCEA97B))
-					currentImageHolder.addEventListener(MouseEvent.MOUSE_OVER, imageOverHandler);
-					currentImageHolder.addEventListener(MouseEvent.MOUSE_OUT, imageOutHandler);
+					currentBitmap.scaleX = scale;
+					currentBitmap.scaleY = scale;
+					//currentImageHolder.addChild(createBorder(0xCEA97B))
+					//currentImageHolder.addEventListener(MouseEvent.MOUSE_OVER, imageOverHandler);
+					//currentImageHolder.addEventListener(MouseEvent.MOUSE_OUT, imageOutHandler);
 					currentImageHolder.addEventListener(MouseEvent.MOUSE_DOWN, imageDownHandler);
 					currentImagesContainer.addChild(currentImageHolder);
 					TweenLite.to(currentImageHolder,1, {alpha:1, delay:(.075*imageNumber)});
