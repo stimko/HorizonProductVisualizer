@@ -40,10 +40,10 @@ package com.sigmagroup.components
 		private var displayNames:Boolean;
 		private var pageVosReference:Array = new Array();
 		private var vos:Vector.<Object> = new Vector.<Object>;
-		protected var scale:Number;
 		
 		public var currentSelected:int;
-		
+		protected var previouslySelected:int;
+		protected var scale:Number;
 		protected var currentVO:Object;
 		protected var totalImages:int;
 		protected var imageWidth:int;
@@ -138,6 +138,7 @@ package com.sigmagroup.components
 			if(reachedTheEnd)
 			{
 				currentPageVosReference = pageVosReference[1];
+				currentVO = currentPageVosReference[0];
 				initiateDisplayFunction();
 			}
 		}
@@ -232,11 +233,6 @@ package com.sigmagroup.components
 			return tf;
 		}
 		
-		protected function imageDownHandler(event:MouseEvent):void
-		{
-			currentSelected = currentImagesContainer.getChildIndex(event.currentTarget as Sprite);
-			currentVO = currentPageVosReference[currentSelected];
-		}
 		
 		protected function loadPage():void
 		{	
@@ -258,13 +254,20 @@ package com.sigmagroup.components
 			removeChild(currentImagesContainer);
 			animateTiles();
 		}
+		protected function assignCurrentSelected(current:Sprite):void
+		{
+			previouslySelected = currentSelected;
+			currentSelected = currentImagesContainer.getChildIndex(current);
+			
+			if(previouslySelected != currentSelected)
+			currentVO = currentPageVosReference[currentSelected];
+		}
 		
 		//POSSIBLY OVERIDDEN METHODS
-		public function imageOverHandler(event:MouseEvent):void{};
-		public function imageOutHandler(event:MouseEvent):void{};
+		protected function imageOverHandler(event:MouseEvent):void{};
+		protected function imageOutHandler(event:MouseEvent):void{};
+		protected function imageDownHandler(event:MouseEvent):void{assignCurrentSelected(event.currentTarget as Sprite)};
 
-		public function checkXmlLength():void{};
-		
 		public function createBorder(color:uint):DisplayObject
 		{
 			var border:Shape = new Shape();

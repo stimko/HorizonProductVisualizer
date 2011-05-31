@@ -58,8 +58,8 @@ package com.horizon.utils
 			for (var i:int = 0; i<xmlLength; i++)
 			{
 				var csVO:Object = new ColorSwatchVO();
-				//vo.url = String(theXML.surface[i].item[0].@imagesrc);
-				csVO.url = 'assets/images/clients/brut.jpg';
+				csVO.url = xml.item[i].@imagesrc;
+				//csVO.url = 'assets/images/clients/brut.jpg';
 				csVO.hex = xml.item[i].@hex;
 				voarray.push(csVO);
 			}	

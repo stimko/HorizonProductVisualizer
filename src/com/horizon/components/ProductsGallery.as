@@ -39,12 +39,12 @@ package com.horizon.components
 			return voarray;
 		}*/
 		
-		override public function imageOverHandler(event:MouseEvent):void
+		override protected function imageOverHandler(event:MouseEvent):void
 		{
 			event.currentTarget.addChild(createBorder(0x9E9C9A));	
 		}
 		
-		override public function imageOutHandler(event:MouseEvent):void
+		override protected function imageOutHandler(event:MouseEvent):void
 		{
 			var currentImage:Sprite = event.currentTarget as Sprite;
 			currentImage.removeChild(currentImage.getChildAt(currentImage.numChildren-1));	

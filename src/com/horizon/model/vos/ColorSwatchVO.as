@@ -6,6 +6,17 @@ package com.horizon.model.vos
 	{
 		private var _url:String;
 		private var _hex:String;
+		private var _bmData:BitmapData;
+
+		public function get bmData():BitmapData
+		{
+			return _bmData;
+		}
+
+		public function set bmData(value:BitmapData):void
+		{
+			_bmData = value;
+		}
 
 		public function get hex():String
 		{
