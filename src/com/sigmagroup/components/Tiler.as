@@ -320,9 +320,9 @@ package com.sigmagroup.components
 					currentImageHolder.buttonMode = true;
 					currentBitmap.scaleX = scale;
 					currentBitmap.scaleY = scale;
-					//currentImageHolder.addChild(createBorder(0xCEA97B))
-					//currentImageHolder.addEventListener(MouseEvent.MOUSE_OVER, imageOverHandler);
-					//currentImageHolder.addEventListener(MouseEvent.MOUSE_OUT, imageOutHandler);
+					currentImageHolder.addChild(createBorder(0xCEA97B))
+					currentImageHolder.addEventListener(MouseEvent.MOUSE_OVER, imageOverHandler);
+					currentImageHolder.addEventListener(MouseEvent.MOUSE_OUT, imageOutHandler);
 					currentImageHolder.addEventListener(MouseEvent.MOUSE_DOWN, imageDownHandler);
 					currentImagesContainer.addChild(currentImageHolder);
 					TweenLite.to(currentImageHolder,1, {alpha:1, delay:(.075*imageNumber)});

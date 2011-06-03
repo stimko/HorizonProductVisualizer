@@ -24,28 +24,6 @@ package com.horizon.components
 			addEventListener(ColorSwatchEvent.MASK_READY, onMaskReady);
 		}
 		
-		/*override public function checkXmlLength():void
-		{
-			var thexmlLength:int = theXML.client.length();
-			
-			if(totalImages==0 || thexmlLength < totalImages)
-				totalImages = theXML.client.length();
-		}
-	
-		override public function generateVoArray(maxIndex:int):Array
-		{
-			var voarray:Array = new Array;
-			
-			for (var i:int = currentIndex; i<maxIndex; i++)
-			{
-				var vo:Object = new Object;
-				vo.url = String(theXML.client[i].@imageurl);
-				vo.size = String(theXML.client[i].@size);	
-				voarray.push(vo);
-			}	
-			return voarray;
-		}*/
-		
 		override protected function imageOverHandler(event:MouseEvent):void
 		{
 			event.currentTarget.addChild(createBorder(0x9E9C9A));	
@@ -74,9 +52,9 @@ package com.horizon.components
 			bitmapContainer.scaleX = bitmapContainer.scaleY = .5;
 			bitmapContainer.addChild(copyBitmap);
 			bitmapContainer.startDrag();
-			bitmapContainer.x = mouseX - (localMouseX * (1 + scaleNum));
-			bitmapContainer.y = mouseY - (localMouseY * (1 + scaleNum));
 			bitmapContainer.scaleX = bitmapContainer.scaleY = ratio;
+			bitmapContainer.x = mouseX - (bitmapContainer.width/2);
+			bitmapContainer.y = mouseY - (bitmapContainer.height/2);
 			//TweenLite.to(bitmapContainer,3, {scaleX:ratio, scaleY:ratio});
 			addChild(bitmapContainer);
 			

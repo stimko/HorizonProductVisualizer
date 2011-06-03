@@ -27,7 +27,6 @@ package com.horizon.model
 			_surfacesXML = value;
 		}
 
-
 		public function get productsVOsReference():Vector.<Object>
 		{
 			return _productsVOsReference;

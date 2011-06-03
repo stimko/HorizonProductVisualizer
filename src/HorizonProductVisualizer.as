@@ -141,7 +141,7 @@ package
 		{
 			if(!productsGallery)
 			{
-				productsGallery = new ProductsGallery(visualizerModel.productsVOsReference,true, true, 154, 125, 3, 3, 3, 3, 0, false, .5, 600, 100);
+				productsGallery = new ProductsGallery(visualizerModel.productsVOsReference,true, true, 96, 96, 3, 3, 3, 3, 0, false, 1, 500, 100);
 				contentHolder.addChild(productsGallery);
 				productsGallery.buttonMode = true;
 /*				productsGallery.scaleX = .5;

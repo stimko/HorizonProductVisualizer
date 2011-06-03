@@ -15,5 +15,7 @@ package com.horizon.events
 			super(type, bubbles, cancelable);
 			this.maskSprite = maskSprite;
 		}
+		
+		//override clone method!!!!!!!!!!
 	}
 }
