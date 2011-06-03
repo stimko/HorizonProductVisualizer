@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Root xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 <surface name="jeans" id="29">
-<item imagesrc="assets/images/surfaces/vis-tshirt-black.jpg" hex="000000" name="Test 1" id="1"/>
-<item imagesrc="assets/images/surfaces/vis-tshirt-blue.jpg" hex="666666" name="test2" id="2"/>
-<item imagesrc="assets/images/surfaces/vis-tshirt-pink.jpg" hex="223455" name="Test 1" id="1"/>
-<item imagesrc="assets/images/surfaces/vis-tshirt-tan.jpg" hex="223455" name="test2" id="2"/>
+<item imagesrc="assets/images/surfaces/vis-tshirt-pink.png" hex="000000" name="Test 1" id="1"/>
+<item imagesrc="assets/images/surfaces/vis-tshirt-blue.png" hex="666666" name="test2" id="2"/>
+<item imagesrc="assets/images/surfaces/vis-tshirt-black.png" hex="223455" name="Test 1" id="1"/>
+<item imagesrc="assets/images/surfaces/vis-tshirt-tan.png" hex="223455" name="test2" id="2"/>
 </surface>
 <surface name="Shirt" id="31">
-<item imagesrc="assets/images/surfaces/vis-tshirt-green.jpg" hex="000000" name="blue" id="3"/>
-<item imagesrc="assets/images/surfaces/vis-tshirt-red.jpg" hex="223455" name="red" id="3"/>
-
+<item imagesrc="assets/images/surfaces/vis-tshirt-green.png" hex="000000" name="blue" id="3"/>
+<item imagesrc="assets/images/surfaces/vis-tshirt-red.png" hex="223455" name="red" id="3"/>
 </surface>
 </Root>

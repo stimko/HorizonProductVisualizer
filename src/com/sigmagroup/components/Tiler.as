@@ -42,6 +42,9 @@ package com.sigmagroup.components
 		private var vos:Vector.<Object> = new Vector.<Object>;
 		
 		public var currentSelected:int;
+		
+		protected var startingY:int;
+		protected var startingX:int;
 		protected var previouslySelected:int;
 		protected var scale:Number;
 		protected var currentVO:Object;
@@ -58,7 +61,7 @@ package com.sigmagroup.components
 		
 		protected var currentImagesContainer:Sprite;
 		
-		public function Tiler( vos:Vector.<Object>, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int = 1, totalImages:int = 0, displayNames:Boolean = false, scale:Number = 1)
+		public function Tiler( vos:Vector.<Object>, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int = 1, totalImages:int = 0, displayNames:Boolean = false, scale:Number = 1, startingX:int = 0, startingY:int= 0)
 		{
 			this.specifiedNumOfRows = specifiedNumOfRows;
 			this.specifiedNumOfColumns = specifiedNumOfColumns;
@@ -71,6 +74,8 @@ package com.sigmagroup.components
 			this.displayNames = displayNames;
 			this.scale = scale;
 			this.vos = vos;
+			this.startingX = startingX;
+			this.startingY = startingY;
 			
 			this.numOfRows = this.specifiedNumOfRows;
 			this.imagesPerPage = specifiedNumOfRows * specifiedNumOfColumns;
@@ -170,8 +175,8 @@ package com.sigmagroup.components
 			myFormat.italic = true;  
 			tf.setTextFormat(myFormat);
 			
-			tfmc.x = 30*pageNumber;
-			tfmc.y = 10;
+			tfmc.x = (30*pageNumber) + startingX;
+			tfmc.y = startingY + 10;
 			tfmc.addChild(tf);
 			tfmc.buttonMode = true;
 			addChild(tfmc);
@@ -228,11 +233,10 @@ package com.sigmagroup.components
 			myFormat.italic = true;  
 			tf.setTextFormat(myFormat);	
 			
-			tf.x = (imageWidth/2) - (tf.width/2);
-			tf.y = (imageHeight + 10);
+			tf.x = ((imageWidth/2) - (tf.width/2));
+			tf.y = ((imageHeight + 10));
 			return tf;
 		}
-		
 		
 		protected function loadPage():void
 		{	
@@ -293,7 +297,7 @@ package com.sigmagroup.components
 			
 			for(var i:int = 1; i<=numOfRows; i++)
 			{
-				currentY = (i-1)*(totalHeight*scale);
+				currentY = ((i-1)*(totalHeight*scale))+ startingY;
 				var tileDifference:int = (i*specifiedNumOfColumns) - numberOfImagesToAnimate;
 				
 				if(tileDifference > 0)
@@ -311,7 +315,7 @@ package com.sigmagroup.components
 					currentBitmap.smoothing = true;
 					currentImageHolder.addChild(currentBitmap);
 					currentImageHolder.alpha = 0;
-					currentImageHolder.x = a*(totalWidth * scale);
+					currentImageHolder.x = (a*(totalWidth * scale)) + startingX;
 					currentImageHolder.y = currentY;
 					currentImageHolder.buttonMode = true;
 					currentBitmap.scaleX = scale;

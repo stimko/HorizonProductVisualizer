@@ -1,5 +1,7 @@
 package com.horizon.components
 {
+	import com.horizon.events.ColorSwatchEvent;
+	import com.horizon.events.ProductEvent;
 	import com.horizon.utils.VisualizerUtils;
 	import com.sigmagroup.components.Tiler;
 	
@@ -7,14 +9,19 @@ package com.horizon.components
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
 	
+	import gs.TweenLite;
+	
 	public class ProductsGallery extends Tiler
 	{
 		private var bitmapContainer:Sprite;
+		private var productsMaskedContainer:Sprite;
+		private var maskSprite:Sprite;
 		
-		public function ProductsGallery(vos:Vector.<Object>, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int=1, totalImages:int=0, displayNames:Boolean = false, scale:Number = 1)
+		public function ProductsGallery(vos:Vector.<Object>, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int=1, totalImages:int=0, displayNames:Boolean = false, scale:Number = 1, startingX:int = 0, startingY:int = 0)
 		{
 			initiateDisplayFunction = loadPage;
-			super(vos, paginate, bitmap, imageWidth, imageHeight, horPadding, vertPadding, specifiedNumOfColumns, specifiedNumOfRows, totalImages, displayNames, scale);
+			super(vos, paginate, bitmap, imageWidth, imageHeight, horPadding, vertPadding, specifiedNumOfColumns, specifiedNumOfRows, totalImages, displayNames, scale, startingX, startingY);
+			addEventListener(ColorSwatchEvent.MASK_READY, onMaskReady);
 		}
 		
 		/*override public function checkXmlLength():void
@@ -64,11 +71,13 @@ package com.horizon.components
 			copyBitmap.smoothing = true;
 			
 			bitmapContainer = new Sprite();
+			bitmapContainer.scaleX = bitmapContainer.scaleY = .5;
 			bitmapContainer.addChild(copyBitmap);
 			bitmapContainer.startDrag();
-			bitmapContainer.scaleX = bitmapContainer.scaleY = ratio;
 			bitmapContainer.x = mouseX - (localMouseX * (1 + scaleNum));
 			bitmapContainer.y = mouseY - (localMouseY * (1 + scaleNum));
+			bitmapContainer.scaleX = bitmapContainer.scaleY = ratio;
+			//TweenLite.to(bitmapContainer,3, {scaleX:ratio, scaleY:ratio});
 			addChild(bitmapContainer);
 			
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
@@ -82,6 +91,8 @@ package com.horizon.components
 			bitmapContainer.addEventListener(MouseEvent.MOUSE_DOWN, moveProduct);
 			bitmapContainer.stopDrag();
 			bitmapContainer.buttonMode = true;
+			bitmapContainer.y -= 60;
+			productsMaskedContainer.addChild(bitmapContainer);
 		}
 		
 		private function onMouseMove(event:MouseEvent):void
@@ -104,6 +115,26 @@ package com.horizon.components
 		{
 			event.currentTarget.stopDrag();	
 			event.currentTarget.removeEventListener(MouseEvent.MOUSE_UP, ceaseDraggage);
+		}
+		
+		private function onMaskReady(event:ColorSwatchEvent):void
+		{
+			productsMaskedContainer = new Sprite();
+			
+/*			var whiteSquare:Sprite = new Sprite();
+			whiteSquare.graphics.beginFill(0xFFFFFF);
+			whiteSquare.graphics.drawRect(0,0,500,380);
+			whiteSquare.graphics.endFill();
+			productsMaskedContainer.addChild(whiteSquare);*/
+			productsMaskedContainer.y = 60;
+			addChild(productsMaskedContainer);
+			
+			productsMaskedContainer.cacheAsBitmap = true;
+			maskSprite = event.maskSprite;
+			maskSprite.y = 60;
+			
+			addChild(maskSprite);
+			productsMaskedContainer.mask = maskSprite;
 		}
 		
 		private function getRatio(bmc:Sprite):Number

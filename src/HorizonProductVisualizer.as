@@ -6,6 +6,8 @@ package
 	import com.horizon.components.ColorPicker;
 	import com.horizon.components.ProductsGallery;
 	import com.horizon.components.SurfacesGallery;
+	import com.horizon.events.ColorSwatchEvent;
+	import com.horizon.events.ProductEvent;
 	import com.horizon.model.VisualizerModel;
 	import com.horizon.model.vos.SurfaceVO;
 	import com.horizon.utils.VisualizerUtils;
@@ -25,6 +27,7 @@ package
 	import flash.display.StageScaleMode;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.geom.Point;
 	import flash.net.FileReference;
 	import flash.net.URLLoader;
 	import flash.net.URLLoaderDataFormat;
@@ -35,6 +38,8 @@ package
 	import flash.utils.ByteArray;
 	
 	import gs.TweenLite;
+	
+	import org.osmf.layout.AbsoluteLayoutFacet;
 	
 	[SWF(width='902', height='515', backgroundColor='#ffffff', frameRate='30')]
 	
@@ -82,6 +87,13 @@ package
 			visualizerModel = VisualizerModel.getInstance();
 			initSurfacesGallery();
 			addChild(contentHolder);
+			addEventListener(ColorSwatchEvent.MASK_READY, onMaskReady);
+		}
+		
+		private function onMaskReady(event:ColorSwatchEvent):void
+		{
+			var csEvent:ColorSwatchEvent = new ColorSwatchEvent(event.maskSprite, event.type);
+			productsGallery.dispatchEvent(csEvent);
 		}
 		
 		private function initSurfacesGallery():void
@@ -92,7 +104,7 @@ package
 		private function initProductsGallery():void
 		{
 			if(!productsXml)
-				loadProductsXml('clients.xml');
+				loadProductsXml('products.xml');
 			else
 				createProductsGallery();
 		}
@@ -114,11 +126,9 @@ package
 		{
 			if(!surfacesGallery)
 			{
-				surfacesGallery = new SurfacesGallery(visualizerModel.surfacesVOsReference, false, true, 154, 125, 10, 10, 5, 1, 5, true);
+				surfacesGallery = new SurfacesGallery(visualizerModel.surfacesVOsReference, false, true, 154, 125, 10, 10, 5, 1, 5, true, 1, 45, 75);
 				contentHolder.addChild(surfacesGallery);
 				surfacesGallery.buttonMode = true;
-				surfacesGallery.x = 45;
-				surfacesGallery.y = 100;
 			}
 			else
 			{
@@ -131,13 +141,11 @@ package
 		{
 			if(!productsGallery)
 			{
-				productsGallery = new ProductsGallery(visualizerModel.productsVOsReference,true, true, 154, 125, 3, 3, 3, 3, 0, false, .5);
+				productsGallery = new ProductsGallery(visualizerModel.productsVOsReference,true, true, 154, 125, 3, 3, 3, 3, 0, false, .5, 600, 100);
 				contentHolder.addChild(productsGallery);
 				productsGallery.buttonMode = true;
 /*				productsGallery.scaleX = .5;
 				productsGallery.scaleY = .5;*/
-				productsGallery.x = 600;
-				productsGallery.y = 100;
 				
 				/*				var dummyarray:Array = ['hello', 'hi', 'shark'];
 				var dp:DataProvider = new DataProvider(dummyarray);
@@ -148,21 +156,19 @@ package
 				contentHolder.addChild(cBox);*/
 			}
 			else
-				displayTheProductsGallery();	
+				displayTheProductsGallery();
 		}
 		
 		private function createColorSwatches():void
 		{
 			if(currentSurface != surfacesGallery.currentSelected)
-			{				
+			{	
 				currentSurface = surfacesGallery.currentSelected;
 				var currentSurfaceVOs:Vector.<Object> = visualizerModel.colorPickerVOsReference[currentSurface];
 				
-				colorSwatches = new ColorPicker(currentSurfaceVOs, false, false, 30, 30, 5, 5, 8, 1, 8, false);
+				colorSwatches = new ColorPicker(currentSurfaceVOs, false, false, 30, 30, 5, 5, 8, 1, 8, false, 1, 10, 400);
 				contentHolder.addChild(colorSwatches);
 				colorSwatches.buttonMode = true;
-				colorSwatches.x = 10;
-				colorSwatches.y = 350;
 			}
 			else
 			{
@@ -178,7 +184,7 @@ package
 			for(var i:int = 0; i<numButtons; i++)
 			{
 				var currentButton:MovieClip = shellButtons.getChildAt(i) as MovieClip;
-				currentButton.buttonMode = true;
+				currentButton.useHandCursor = true;
 				currentButton.addEventListener(MouseEvent.MOUSE_OVER, stepButtonOverHandler);
 				currentButton.addEventListener(MouseEvent.MOUSE_OUT, stepButtonOutHandler);
 				currentButton.addEventListener(MouseEvent.MOUSE_DOWN, stepButtonDownHandler); 
@@ -244,6 +250,7 @@ package
 		{
 			if(!savetodesktopButton){
 				savetodesktopButton = new savetodesktopbutton();
+				savetodesktopButton.y= 150;
 				savetodesktopButton.buttonMode = true;
 				savetodesktopButton.addEventListener(MouseEvent.CLICK, saveImage);
 				contentHolder.addChild(savetodesktopButton);
@@ -254,7 +261,7 @@ package
 			if(!sendtofriendButton)
 			{
 				sendtofriendButton = new sendtofriendbutton();
-				sendtofriendButton.y = 50;
+				sendtofriendButton.y = 200;
 				sendtofriendButton.addEventListener(MouseEvent.CLICK, sendimagetofriend);
 				contentHolder.addChild(sendtofriendButton);
 			}
@@ -283,7 +290,7 @@ package
 			surfacesXml = xmlLoader.content;
 			visualizerModel.surfacesVOsReference = xmlLoader.generateSurfacesVOsReference(surfacesXml);
 			createSurfacesGallery();
-			generateSwatchesXmlReference();
+			generateSwatchesVosReference();
 		}
 		
 		private function loadProductsXml(url:String):void
@@ -300,7 +307,7 @@ package
 			createProductsGallery();
 		}
 		
-		private function generateSwatchesXmlReference():void
+		private function generateSwatchesVosReference():void
 		{
 			var surfacesLength:int = surfacesXml.surface.length();	
 			

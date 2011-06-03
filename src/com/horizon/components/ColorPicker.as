@@ -1,5 +1,7 @@
 package com.horizon.components
 {
+	import com.horizon.events.ColorSwatchEvent;
+	import com.horizon.utils.MaskUtil;
 	import com.sigmagroup.components.Tiler;
 	
 	import flash.display.Bitmap;
@@ -7,6 +9,7 @@ package com.horizon.components
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.geom.Point;
 	import flash.net.URLRequest;
 	
 	import gs.TweenLite;
@@ -16,11 +19,13 @@ package com.horizon.components
 		private var imageContainer:Sprite =  new Sprite;
 		private var previousContainer:Sprite = new Sprite;
 		private var isAnimating:Boolean = false;
+		private var bmMaskSprite:Sprite;
+		private var colorBitmap:Bitmap;
 		
-		public function ColorPicker(vos:Vector.<Object>, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int=1, totalImages:int=0, displayNames:Boolean=false, scale:Number = 1)
+		public function ColorPicker(vos:Vector.<Object>, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int=1, totalImages:int=0, displayNames:Boolean=false, scale:Number = 1, startingX:int = 0, startingY:int = 0)
 		{
 			initiateDisplayFunction = animateTiles;
-			super(vos, paginate, bitmap, imageWidth, imageHeight, horPadding, vertPadding, specifiedNumOfColumns, specifiedNumOfRows, totalImages, displayNames, scale);
+			super(vos, paginate, bitmap, imageWidth, imageHeight, horPadding, vertPadding, specifiedNumOfColumns, specifiedNumOfRows, totalImages, displayNames, scale, startingX, startingY);
 			addChild(imageContainer);
 			loadColorImage();
 		}
@@ -60,14 +65,33 @@ package com.horizon.components
 			imageContainer = new Sprite();
 			addChild(imageContainer);
 			imageContainer.alpha = 0;
-			var colorBitmap:Bitmap = new Bitmap(currentVO.bmData);
+			colorBitmap = new Bitmap(currentVO.bmData);
 			colorBitmap.smoothing = true;
-			colorBitmap.scaleX = .75;
-			colorBitmap.scaleY = .75;
+			//colorBitmap.scaleX = .75;
+			//colorBitmap.scaleY = .75;
 			imageContainer.addChild(colorBitmap);
-			colorBitmap.y = -colorBitmap.height + 50;
-			TweenLite.to(imageContainer,1, {alpha:1, onComplete:removePreviousContainer});
+			//colorBitmap.y = -colorBitmap.height + 25;
+			colorBitmap.y = 60;
+			TweenLite.to(imageContainer,.5, {alpha:1, onComplete:removePreviousContainer});
 			isAnimating = true;
+			
+			if(!bmMaskSprite)
+				createAndDisplayMask();
+		}
+		
+		private function createAndDisplayMask():void
+		{
+			//bmMask = MaskUtil.convertPngToMask(currentVO.bmData);
+			//bm.scaleX = .75;
+			//bm.scaleY = .75;
+			var maskBitmap:Bitmap = new Bitmap(currentVO.bmData);
+			bmMaskSprite = new Sprite();
+			bmMaskSprite.addChild(maskBitmap);
+			bmMaskSprite.cacheAsBitmap = true;
+		
+			
+			dispatchEvent(new ColorSwatchEvent(bmMaskSprite, ColorSwatchEvent.MASK_READY, true));
+			//addChild(bm);
 		}
 		override public function reAnimate():void
 		{
@@ -79,7 +103,7 @@ package com.horizon.components
 		
 		private function animateImageContainer():void
 		{
-			TweenLite.to(imageContainer,1, {alpha:1});
+			TweenLite.to(imageContainer,.5, {alpha:1});
 		}
 		
 		private function removePreviousContainer():void
@@ -105,7 +129,7 @@ package com.horizon.components
 			
 			for(var i:int = 1; i<=numOfRows; i++)
 			{
-				currentY = (i-1)*totalHeight;
+				currentY = ((i-1)*totalHeight) + startingY;
 				var tileDifference:int = (i*specifiedNumOfColumns) - numberOfSwatchesToAnimate;
 				
 				if(tileDifference > 0)
@@ -126,7 +150,7 @@ package com.horizon.components
 					
 					currentSwatchHolder.addChild(currentSwatch);
 					currentSwatchHolder.alpha = 0;
-					currentSwatchHolder.x = a*totalWidth;
+					currentSwatchHolder.x = (a*totalWidth) + startingX;
 					currentSwatchHolder.y = currentY;
 					currentSwatchHolder.buttonMode = true;
 					//currentImageHolder.addEventListener(MouseEvent.MOUSE_OVER, imageOverHandler);
