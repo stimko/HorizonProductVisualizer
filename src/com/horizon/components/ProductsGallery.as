@@ -16,6 +16,7 @@ package com.horizon.components
 		private var bitmapContainer:Sprite;
 		private var productsMaskedContainer:Sprite;
 		private var maskSprite:Sprite;
+		private var currentMouseUpHandler:Function;
 		
 		public function ProductsGallery(vos:Vector.<Object>, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int=1, totalImages:int=0, displayNames:Boolean = false, scale:Number = 1, startingX:int = 0, startingY:int = 0)
 		{
@@ -60,13 +61,14 @@ package com.horizon.components
 			
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 			stage.addEventListener(MouseEvent.MOUSE_UP, mouseUpHandler);
+			
+			currentMouseUpHandler = mouseUpHandler;
 		}
 		
 		private function mouseUpHandler(event:MouseEvent):void
 		{
-			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUpHandler);
-			stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
-			bitmapContainer.addEventListener(MouseEvent.MOUSE_DOWN, moveProduct);
+			removeMouseListeners();
+			bitmapContainer.addEventListener(MouseEvent.MOUSE_DOWN, productMouseDown);
 			bitmapContainer.stopDrag();
 			bitmapContainer.buttonMode = true;
 			bitmapContainer.y -= 60;
@@ -75,31 +77,49 @@ package com.horizon.components
 		
 		private function onMouseMove(event:MouseEvent):void
 		{
+			checkDragBoundaries(event);
+		}
+		
+		private function productMouseDown(event:MouseEvent):void
+		{
+			bitmapContainer = event.currentTarget as Sprite;
+			bitmapContainer.y += 60;
+			addChild(bitmapContainer);
+			bitmapContainer.startDrag();
+			stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
+			stage.addEventListener(MouseEvent.MOUSE_UP, ceaseDraggage);
+			currentMouseUpHandler = ceaseDraggage;
+		}
+		
+		private function checkDragBoundaries(event:MouseEvent):void
+		{
 			if(event.stageX<0 || event.stageX>stage.stageWidth || event.stageY<0 || event.stageY>stage.stageHeight){
-				stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUpHandler);
-				stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
+				removeMouseListeners();
 				bitmapContainer.stopDrag();
 				removeChild(bitmapContainer);
 			}
 		}
 		
-		private function moveProduct(event:MouseEvent):void
-		{
-			event.currentTarget.startDrag();
-			event.currentTarget.addEventListener(MouseEvent.MOUSE_UP, ceaseDraggage);
-		}
-		
 		private function ceaseDraggage(event:MouseEvent):void
 		{
-			event.currentTarget.stopDrag();	
-			event.currentTarget.removeEventListener(MouseEvent.MOUSE_UP, ceaseDraggage);
+			bitmapContainer.stopDrag();	
+			removeMouseListeners();
+			
+			bitmapContainer.y -= 60;
+			productsMaskedContainer.addChild(bitmapContainer);
+		}
+		
+		private function removeMouseListeners():void
+		{
+			stage.removeEventListener(MouseEvent.MOUSE_UP, currentMouseUpHandler);
+			stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 		}
 		
 		private function onMaskReady(event:ColorSwatchEvent):void
 		{
 			productsMaskedContainer = new Sprite();
 			
-/*			var whiteSquare:Sprite = new Sprite();
+			/*			var whiteSquare:Sprite = new Sprite();
 			whiteSquare.graphics.beginFill(0xFFFFFF);
 			whiteSquare.graphics.drawRect(0,0,500,380);
 			whiteSquare.graphics.endFill();
