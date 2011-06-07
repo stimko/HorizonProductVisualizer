@@ -1,31 +1,31 @@
 package com.horizon.components
 {
 	import com.horizon.events.ColorSwatchEvent;
-	import com.horizon.events.ProductEvent;
 	import com.horizon.utils.VisualizerUtils;
 	import com.sigmagroup.components.Tiler;
 	
 	import flash.display.Bitmap;
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
+	import flash.filters.DropShadowFilter;
 	
 	import gs.TweenLite;
 	
 	public class ProductsGallery extends Tiler
 	{
 		private var bitmapContainer:Sprite;
-		private var productsMaskedContainer:Sprite;
 		private var maskSprite:Sprite;
-		private var currentMouseUpHandler:Function;
 		
 		public function ProductsGallery(vos:Vector.<Object>, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int=1, totalImages:int=0, displayNames:Boolean = false, scale:Number = 1, startingX:int = 0, startingY:int = 0)
 		{
 			initiateDisplayFunction = loadPage;
-			super(vos, paginate, bitmap, imageWidth, imageHeight, horPadding, vertPadding, specifiedNumOfColumns, specifiedNumOfRows, totalImages, displayNames, scale, startingX, startingY);
 			addEventListener(ColorSwatchEvent.MASK_READY, onMaskReady);
+			contentContainer = new Sprite();
+			addChild(contentContainer);
+			super(vos, paginate, bitmap, imageWidth, imageHeight, horPadding, vertPadding, specifiedNumOfColumns, specifiedNumOfRows, totalImages, displayNames, scale, startingX, startingY);
 		}
 		
-		override protected function imageOverHandler(event:MouseEvent):void
+/*		override protected function imageOverHandler(event:MouseEvent):void
 		{
 			event.currentTarget.addChild(createBorder(0x9E9C9A));	
 		}
@@ -34,15 +34,13 @@ package com.horizon.components
 		{
 			var currentImage:Sprite = event.currentTarget as Sprite;
 			currentImage.removeChild(currentImage.getChildAt(currentImage.numChildren-1));	
-		}
+		}*/
 		
 		override protected function imageDownHandler(event:MouseEvent):void
 		{
 			currentSelected = currentImagesContainer.getChildIndex(event.currentTarget as Sprite);
 			currentVO = currentPageVosReference[currentSelected];
 			
-			var localMouseX:int = event.target.mouseX;
-			var localMouseY:int = event.target.mouseY;
 			var ratio:Number = getRatio(event.target as Sprite);
 			var scaleNum:Number = (ratio - scale)*2;
 			
@@ -56,23 +54,28 @@ package com.horizon.components
 			bitmapContainer.scaleX = bitmapContainer.scaleY = ratio;
 			bitmapContainer.x = mouseX - (bitmapContainer.width/2);
 			bitmapContainer.y = mouseY - (bitmapContainer.height/2);
+			bitmapContainer.buttonMode = true;
 			//TweenLite.to(bitmapContainer,3, {scaleX:ratio, scaleY:ratio});
 			addChild(bitmapContainer);
+			applyDropShadow(bitmapContainer);
 			
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
-			stage.addEventListener(MouseEvent.MOUSE_UP, mouseUpHandler);
-			
-			currentMouseUpHandler = mouseUpHandler;
+			stage.addEventListener(MouseEvent.MOUSE_UP, ceaseDraggage);
+			bitmapContainer.addEventListener(MouseEvent.MOUSE_DOWN, productMouseDown);
 		}
 		
-		private function mouseUpHandler(event:MouseEvent):void
+		override public function reAnimate(animateContentContainer:Boolean=true):void
 		{
-			removeMouseListeners();
-			bitmapContainer.addEventListener(MouseEvent.MOUSE_DOWN, productMouseDown);
-			bitmapContainer.stopDrag();
-			bitmapContainer.buttonMode = true;
-			bitmapContainer.y -= 60;
-			productsMaskedContainer.addChild(bitmapContainer);
+			removeChild(currentImagesContainer);
+			if(animateContentContainer)
+				animateproductsContainer();
+			animateTiles();
+		}
+		
+		private function animateproductsContainer():void
+		{
+			contentContainer.alpha = 0;
+			TweenLite.to(contentContainer,1, {alpha:1});
 		}
 		
 		private function onMouseMove(event:MouseEvent):void
@@ -88,7 +91,7 @@ package com.horizon.components
 			bitmapContainer.startDrag();
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 			stage.addEventListener(MouseEvent.MOUSE_UP, ceaseDraggage);
-			currentMouseUpHandler = ceaseDraggage;
+			applyDropShadow(bitmapContainer);
 		}
 		
 		private function checkDragBoundaries(event:MouseEvent):void
@@ -102,37 +105,57 @@ package com.horizon.components
 		
 		private function ceaseDraggage(event:MouseEvent):void
 		{
-			bitmapContainer.stopDrag();	
 			removeMouseListeners();
-			
+			bitmapContainer.stopDrag();	
 			bitmapContainer.y -= 60;
-			productsMaskedContainer.addChild(bitmapContainer);
+			contentContainer.addChild(bitmapContainer);
+			removeDropShadow(bitmapContainer);
 		}
 		
 		private function removeMouseListeners():void
 		{
-			stage.removeEventListener(MouseEvent.MOUSE_UP, currentMouseUpHandler);
+			stage.removeEventListener(MouseEvent.MOUSE_UP, ceaseDraggage);
 			stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 		}
 		
 		private function onMaskReady(event:ColorSwatchEvent):void
 		{
-			productsMaskedContainer = new Sprite();
+			contentContainer = new Sprite();
 			
 			/*			var whiteSquare:Sprite = new Sprite();
 			whiteSquare.graphics.beginFill(0xFFFFFF);
 			whiteSquare.graphics.drawRect(0,0,500,380);
 			whiteSquare.graphics.endFill();
-			productsMaskedContainer.addChild(whiteSquare);*/
-			productsMaskedContainer.y = 60;
-			addChild(productsMaskedContainer);
+			contentContainer.addChild(whiteSquare);*/
+			contentContainer.y = 60;
+			addChild(contentContainer);
 			
-			productsMaskedContainer.cacheAsBitmap = true;
+			contentContainer.cacheAsBitmap = true;
 			maskSprite = event.maskSprite;
 			maskSprite.y = 60;
 			
 			addChild(maskSprite);
-			productsMaskedContainer.mask = maskSprite;
+			contentContainer.mask = maskSprite;
+		}
+		
+		private function applyDropShadow(sprite:Sprite):void
+		{
+			var my_shadow:DropShadowFilter = new DropShadowFilter();  
+			my_shadow.color = 0x000000;  
+			my_shadow.blurY = 8;  
+			my_shadow.blurX = 8;  
+			my_shadow.angle = 100;  
+			my_shadow.alpha = .5;  
+			my_shadow.distance = 6;
+			
+			var filtersArray:Array = new Array(my_shadow);  
+			
+			sprite.filters = filtersArray;
+		}
+		
+		private function removeDropShadow(sprite:Sprite):void
+		{
+			sprite.filters = null;
 		}
 		
 		private function getRatio(bmc:Sprite):Number

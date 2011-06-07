@@ -1,7 +1,6 @@
 package com.horizon.components
 {
 	import com.horizon.events.ColorSwatchEvent;
-	import com.horizon.utils.MaskUtil;
 	import com.sigmagroup.components.Tiler;
 	
 	import flash.display.Bitmap;
@@ -9,14 +8,12 @@ package com.horizon.components
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
-	import flash.geom.Point;
 	import flash.net.URLRequest;
 	
 	import gs.TweenLite;
 	
 	public class ColorPicker extends Tiler
 	{
-		private var imageContainer:Sprite =  new Sprite;
 		private var previousContainer:Sprite = new Sprite;
 		private var isAnimating:Boolean = false;
 		private var bmMaskSprite:Sprite;
@@ -25,8 +22,9 @@ package com.horizon.components
 		public function ColorPicker(vos:Vector.<Object>, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int=1, totalImages:int=0, displayNames:Boolean=false, scale:Number = 1, startingX:int = 0, startingY:int = 0)
 		{
 			initiateDisplayFunction = animateTiles;
+			contentContainer = new Sprite();
+			addChild(contentContainer);
 			super(vos, paginate, bitmap, imageWidth, imageHeight, horPadding, vertPadding, specifiedNumOfColumns, specifiedNumOfRows, totalImages, displayNames, scale, startingX, startingY);
-			addChild(imageContainer);
 			loadColorImage();
 		}
 		
@@ -61,18 +59,18 @@ package com.horizon.components
 		
 		private function displayColorImage():void
 		{
-			previousContainer = imageContainer;
-			imageContainer = new Sprite();
-			addChild(imageContainer);
-			imageContainer.alpha = 0;
+			previousContainer = contentContainer;
+			contentContainer = new Sprite();
+			addChild(contentContainer);
+			contentContainer.alpha = 0;
 			colorBitmap = new Bitmap(currentVO.bmData);
 			colorBitmap.smoothing = true;
 			//colorBitmap.scaleX = .75;
 			//colorBitmap.scaleY = .75;
-			imageContainer.addChild(colorBitmap);
+			contentContainer.addChild(colorBitmap);
 			//colorBitmap.y = -colorBitmap.height + 25;
 			colorBitmap.y = 60;
-			TweenLite.to(imageContainer,.5, {alpha:1, onComplete:removePreviousContainer});
+			TweenLite.to(contentContainer,.5, {alpha:1, onComplete:removePreviousContainer});
 			isAnimating = true;
 			
 			if(!bmMaskSprite)
@@ -93,17 +91,18 @@ package com.horizon.components
 			dispatchEvent(new ColorSwatchEvent(bmMaskSprite, ColorSwatchEvent.MASK_READY, true));
 			//addChild(bm);
 		}
-		override public function reAnimate():void
+		override public function reAnimate(animateContentContainer:Boolean=true):void
 		{
 			removeChild(currentImagesContainer);
 			animateTiles();
-			imageContainer.alpha = 0;
+			if(animateContentContainer)
 			animateImageContainer();
 		}
 		
 		private function animateImageContainer():void
 		{
-			TweenLite.to(imageContainer,.5, {alpha:1});
+			contentContainer.alpha = 0;
+			TweenLite.to(contentContainer,.5, {alpha:1});
 		}
 		
 		private function removePreviousContainer():void

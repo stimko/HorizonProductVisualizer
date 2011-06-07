@@ -16,6 +16,7 @@ package com.sigmagroup.components
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.filters.GlowFilter;
 	import flash.net.URLRequest;
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
@@ -42,6 +43,7 @@ package com.sigmagroup.components
 		private var vos:Vector.<Object> = new Vector.<Object>;
 		
 		public var currentSelected:int;
+		public var contentContainer:Sprite;
 		
 		protected var startingY:int;
 		protected var startingX:int;
@@ -58,7 +60,6 @@ package com.sigmagroup.components
 		protected var currentIndex:int;
 		protected var currentPageVosReference:Vector.<Object> = new Vector.<Object>();
 		protected var initiateDisplayFunction:Function;
-		
 		protected var currentImagesContainer:Sprite;
 		
 		public function Tiler( vos:Vector.<Object>, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int = 1, totalImages:int = 0, displayNames:Boolean = false, scale:Number = 1, startingX:int = 0, startingY:int= 0)
@@ -175,8 +176,8 @@ package com.sigmagroup.components
 			myFormat.italic = true;  
 			tf.setTextFormat(myFormat);
 			
-			tfmc.x = (30*pageNumber) + startingX;
-			tfmc.y = startingY + 10;
+			tfmc.x = (20*(pageNumber-1)) + startingX;
+			tfmc.y = startingY - 40;
 			tfmc.addChild(tf);
 			tfmc.buttonMode = true;
 			addChild(tfmc);
@@ -253,7 +254,7 @@ package com.sigmagroup.components
 			}
 		}
 		
-		public function reAnimate():void
+		public function reAnimate(animateContentContainer:Boolean = true):void
 		{
 			removeChild(currentImagesContainer);
 			animateTiles();
@@ -268,15 +269,30 @@ package com.sigmagroup.components
 		}
 		
 		//POSSIBLY OVERIDDEN METHODS
-		protected function imageOverHandler(event:MouseEvent):void{};
-		protected function imageOutHandler(event:MouseEvent):void{};
+		protected function imageOverHandler(event:MouseEvent):void
+		{
+			var filt:GlowFilter = new GlowFilter(0xff99cc, .5, 20, 20, 3, 2);  
+			var filtArray:Array = [filt];
+						
+			var currentSprite:Sprite = event.currentTarget as Sprite;
+			currentSprite.filters = filtArray; 
+		}
+		
+		protected function imageOutHandler(event:MouseEvent):void
+		{
+			var currentSprite:Sprite = event.currentTarget as Sprite;
+			currentSprite.filters = null; 
+		}
+		
 		protected function imageDownHandler(event:MouseEvent):void{assignCurrentSelected(event.currentTarget as Sprite)};
 
 		public function createBorder(color:uint):DisplayObject
 		{
 			var border:Shape = new Shape();
 			border.graphics.lineStyle(1,color);
-			border.graphics.drawRect(0, 0, imageWidth, imageHeight);
+			border.graphics.drawRect(0, 0, (imageWidth+2), (imageHeight+2));
+			border.x = -1;
+			border.y = -1;
 			
 			return border;
 		}
@@ -293,11 +309,10 @@ package com.sigmagroup.components
 			
 			currentImagesContainer = new Sprite();
 			addChild(currentImagesContainer);
-			currentImagesContainer.y = 50;
 			
 			for(var i:int = 1; i<=numOfRows; i++)
 			{
-				currentY = ((i-1)*(totalHeight*scale))+ startingY;
+				currentY = ((i-1)*(totalHeight*scale)) + startingY;
 				var tileDifference:int = (i*specifiedNumOfColumns) - numberOfImagesToAnimate;
 				
 				if(tileDifference > 0)
@@ -320,7 +335,7 @@ package com.sigmagroup.components
 					currentImageHolder.buttonMode = true;
 					currentBitmap.scaleX = scale;
 					currentBitmap.scaleY = scale;
-					currentImageHolder.addChild(createBorder(0xCEA97B))
+					//currentImageHolder.addChild(createBorder(0xCEA97B))
 					currentImageHolder.addEventListener(MouseEvent.MOUSE_OVER, imageOverHandler);
 					currentImageHolder.addEventListener(MouseEvent.MOUSE_OUT, imageOutHandler);
 					currentImageHolder.addEventListener(MouseEvent.MOUSE_DOWN, imageDownHandler);

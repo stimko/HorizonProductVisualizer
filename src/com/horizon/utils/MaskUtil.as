@@ -3,7 +3,6 @@ package com.horizon.utils
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.BitmapDataChannel;
-	import flash.display.Sprite;
 	import flash.geom.Point;
 
 	public final class MaskUtil

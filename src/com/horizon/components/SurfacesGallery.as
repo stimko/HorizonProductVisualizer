@@ -1,18 +1,10 @@
 package com.horizon.components
 {
-	import com.horizon.model.vos.SurfaceVO;
 	import com.sigmagroup.components.Tiler;
 	
-	import flash.display.Bitmap;
-	import flash.display.BitmapData;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
-	import flash.text.TextField;
-	import flash.text.TextFieldAutoSize;
-	import flash.text.TextFormat;
-	
-	import gs.TweenLite;
 	
 	public class SurfacesGallery extends Tiler
 	{
@@ -22,6 +14,12 @@ package com.horizon.components
 		{
 			initiateDisplayFunction = loadPage;
 			super(vos, paginate, bitmap, imageWidth, imageHeight, horPadding, vertPadding, specifiedNumOfColumns, specifiedNumOfRows, totalImages, displayNames, scale, startingX, startingY);
+		}
+		
+		override protected function imageDownHandler(event:MouseEvent):void
+		{
+			assignCurrentSelected(event.currentTarget as Sprite);
+			dispatchEvent(new Event('newSurfaceSelected', true));
 		}
 	}
 }
