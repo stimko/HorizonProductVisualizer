@@ -8,6 +8,7 @@ package
 	import com.horizon.events.ColorSwatchEvent;
 	import com.horizon.model.VisualizerModel;
 	import com.horizon.utils.VisualizerUtils;
+	import com.horizon.utils.VisualizerVanity;
 	import com.horizon.utils.XmlUtil;
 	import com.sigmagroup.components.Tiler;
 	
@@ -22,7 +23,6 @@ package
 	import flash.display.StageScaleMode;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
-	import com.horizon.utils.VisualizerVanity;
 	
 	import gs.TweenLite;
 	
@@ -49,8 +49,9 @@ package
 		private var currentState:String;
 		private var previousState:String;
 		private var croppedCanvas:Bitmap;
-		private var animateContentContainer:Boolean = true;
+		private var animateContentContainer:Boolean;
 		private var currentSurface:int = -1;
+		private var printButton:assets.swfs.ui.printButton;
 		
 		private var swatchesXml:XML;
 		private var surfacesXml:XML;
@@ -111,10 +112,9 @@ package
 			switch(name){
 				case VisualizerVanity.SURFACES:
 					createSurfacesGallery();
-
 					break;
 				case VisualizerVanity.DESIGN:
-					if(!previousState == VisualizerVanity.PUBLISH)
+					if(previousState != VisualizerVanity.PUBLISH)
 						animateContentContainer = true;	
 					initProductsGallery();
 					break;
@@ -125,13 +125,6 @@ package
 					break; 
 			}
 			addChild(contentHolder);
-		}
-		
-		private function onSurfaceSelected(event:Event):void
-		{
-			reConfigurePreviousButton();
-			assignCurrentButton(shellButtons[VisualizerVanity.DESIGN]);
-			displayPageContent(VisualizerVanity.DESIGN);
 		}
 		
 		private function displayTheProductsGallery():void
@@ -159,13 +152,13 @@ package
 			TweenLite.to(contentHolder,.5, {alpha:1});
 		}
 		
+		//XML LOADING
 		private function loadSurfacesXml(url:String):void
 		{
 			xmlLoader = new XmlUtil();
 			xmlLoader.loadXml(url);
 			xmlLoader.addEventListener(Event.COMPLETE, surfacesXmlLoaded);
 		}
-		//XML LOADING
 		private function surfacesXmlLoaded(event:Event):void
 		{
 			xmlLoader.removeEventListener(Event.COMPLETE, surfacesXmlLoaded);
@@ -276,12 +269,28 @@ package
 				sendtofriendButton.addEventListener(MouseEvent.CLICK, sendimagetofriend);
 			}
 			contentHolder.addChild(sendtofriendButton);
+			
+			if(!printButton)
+			{
+				printButton = new assets.swfs.ui.printButton;	
+				printButton.x = 500;
+				printButton.y = 250;
+				printButton.addEventListener(MouseEvent.CLICK, printTheCreation);
+			}
+			contentHolder.addChild(printButton);
 		}
 		
 		private function enablePublishButton():void
 		{
 			var currentButton:MovieClip = shellButtons.getChildByName(VisualizerVanity.PUBLISH) as MovieClip;
 			this.configShellButton(currentButton);
+		}
+		
+		private function onSurfaceSelected(event:Event):void
+		{
+			reConfigurePreviousButton();
+			assignCurrentButton(shellButtons[VisualizerVanity.DESIGN]);
+			displayPageContent(VisualizerVanity.DESIGN);
 		}
 		
 		private function stepButtonOverHandler(event:MouseEvent):void{event.currentTarget.gotoAndStop('down')}
@@ -349,6 +358,7 @@ package
 		//PUBLISHING UTILS
 		private function saveImage(e:Object):void{VisualizerUtils.saveimagetodesktop(croppedCanvas)}
 		private function sendimagetofriend(e:Object):void{VisualizerUtils.sendimagetofriend(croppedCanvas)}
+		private function printTheCreation(e:Object):void{VisualizerUtils.printCanvas(croppedCanvas)}
 		
 		//DISPLAY
 		private function createProductsFrame():void
