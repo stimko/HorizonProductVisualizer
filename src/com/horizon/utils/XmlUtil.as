@@ -1,5 +1,6 @@
 package com.horizon.utils
 {
+	import com.horizon.model.VisualizerModel;
 	import com.horizon.model.vos.ColorSwatchVO;
 	import com.horizon.model.vos.ProductsVO;
 	import com.horizon.model.vos.SurfaceVO;
@@ -12,10 +13,12 @@ package com.horizon.utils
 	public class XmlUtil extends EventDispatcher
 	{
 		public var content:XML;
+		private var visualizerModel:VisualizerModel = VisualizerModel.getInstance();
+		private var loader:URLLoader;
 				
 		public function loadXml(sourceUrl:String):void
 		{
-			var loader:URLLoader = new URLLoader();
+			loader = new URLLoader();
 			loader.addEventListener(Event.COMPLETE, xmlLoaded);
 			loader.load(new URLRequest(sourceUrl));
 		}
@@ -43,8 +46,8 @@ package com.horizon.utils
 			{
 				var sVO:Object = new SurfaceVO();
 				//vo.url = String(theXML.surface[i].item[0].@imagesrc);
-				sVO.url = 'assets/images/clients/brut.jpg';
-				sVO.displayName = String(xml.surface[i].@name);
+				sVO.url = xml.surface[i].@thumb;
+				sVO.displayName = xml.surface[i].@name;
 				voarray.push(sVO);
 			}	
 			return voarray;
@@ -79,6 +82,48 @@ package com.horizon.utils
 				voarray.push(pVO);
 			}	
 			return voarray;
+		}
+		
+		public function loadSurfacesXml(url:String):void
+		{
+			loadXml(url);
+			addEventListener(Event.COMPLETE, surfacesXmlLoaded);
+		}
+		private function surfacesXmlLoaded(event:Event):void
+		{
+			removeEventListener(Event.COMPLETE, surfacesXmlLoaded);
+			visualizerModel.surfacesXml = content;
+			visualizerModel.surfacesVOsReference = generateSurfacesVOsReference(visualizerModel.surfacesXml);
+			dispatchEvent(new Event('surfacesXMLLoaded'));
+			generateSwatchesVosReference();
+		}
+		
+		public function loadProductsXml(url:String):void
+		{
+			loadXml(url);
+			addEventListener(Event.COMPLETE, productsXmlLoaded);
+		}
+		
+		private function productsXmlLoaded(event:Event):void
+		{
+			removeEventListener(Event.COMPLETE, productsXmlLoaded)
+			visualizerModel.productsXml = content;
+			visualizerModel.productsVOsReference = generateProductsVOsReference(visualizerModel.productsXml);
+			dispatchEvent(new Event('productsXMLLoaded'));
+		}		
+		
+		private function generateSwatchesVosReference():void
+		{
+			var surfacesLength:int = visualizerModel.surfacesXml.surface.length();	
+			
+			for (var i:int = 0; i<surfacesLength; i++)
+			{
+				var item:XMLList = visualizerModel.surfacesXml.surface[i].item;
+				var newXML:XML = convertXmlListToXML(item);
+				var voVector:Vector.<Object> = generateColorSwatchesVOsReference(newXML);
+				
+				visualizerModel.colorPickerVOsReference.push(voVector);
+			}
 		}
 	}
 }

@@ -1,6 +1,7 @@
 package com.horizon.components
 {
 	import com.horizon.events.ColorSwatchEvent;
+	import com.horizon.events.TilerEvent;
 	import com.horizon.utils.VisualizerUtils;
 	import com.sigmagroup.components.Tiler;
 	
@@ -15,13 +16,15 @@ package com.horizon.components
 	{
 		private var bitmapContainer:Sprite;
 		private var maskSprite:Sprite;
+		private const maskSpriteHeight:int = 70;
 		
 		public function ProductsGallery(vos:Vector.<Object>, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int=1, totalImages:int=0, displayNames:Boolean = false, scale:Number = 1, startingX:int = 0, startingY:int = 0)
 		{
 			initiateDisplayFunction = loadPage;
 			addEventListener(ColorSwatchEvent.MASK_READY, onMaskReady);
-			contentContainer = new Sprite();
-			addChild(contentContainer);
+			addEventListener(TilerEvent.CLEANUP_CONTENT, cleanUpSupportContent);
+			supportContentContainer = new Sprite();
+			addChild(supportContentContainer);
 			super(vos, paginate, bitmap, imageWidth, imageHeight, horPadding, vertPadding, specifiedNumOfColumns, specifiedNumOfRows, totalImages, displayNames, scale, startingX, startingY);
 		}
 		
@@ -66,7 +69,7 @@ package com.horizon.components
 		
 		override public function reAnimate(animateContentContainer:Boolean=true):void
 		{
-			removeChild(currentImagesContainer);
+			VisualizerUtils.removeChildren(currentImagesContainer);
 			if(animateContentContainer)
 				animateproductsContainer();
 			animateTiles();
@@ -74,8 +77,8 @@ package com.horizon.components
 		
 		private function animateproductsContainer():void
 		{
-			contentContainer.alpha = 0;
-			TweenLite.to(contentContainer,1, {alpha:1});
+			supportContentContainer.alpha = 0;
+			TweenLite.to(supportContentContainer,.5, {alpha:1});
 		}
 		
 		private function onMouseMove(event:MouseEvent):void
@@ -86,11 +89,12 @@ package com.horizon.components
 		private function productMouseDown(event:MouseEvent):void
 		{
 			bitmapContainer = event.currentTarget as Sprite;
-			bitmapContainer.y += 60;
+			bitmapContainer.y += maskSpriteHeight;
 			addChild(bitmapContainer);
 			bitmapContainer.startDrag();
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 			stage.addEventListener(MouseEvent.MOUSE_UP, ceaseDraggage);
+			bitmapContainer.removeEventListener(MouseEvent.MOUSE_DOWN, productMouseDown);
 			applyDropShadow(bitmapContainer);
 		}
 		
@@ -107,9 +111,10 @@ package com.horizon.components
 		{
 			removeMouseListeners();
 			bitmapContainer.stopDrag();	
-			bitmapContainer.y -= 60;
-			contentContainer.addChild(bitmapContainer);
+			bitmapContainer.y -= maskSpriteHeight;
 			removeDropShadow(bitmapContainer);
+			supportContentContainer.addChild(bitmapContainer);
+			bitmapContainer.addEventListener(MouseEvent.MOUSE_DOWN, productMouseDown);
 		}
 		
 		private function removeMouseListeners():void
@@ -119,23 +124,15 @@ package com.horizon.components
 		}
 		
 		private function onMaskReady(event:ColorSwatchEvent):void
-		{
-			contentContainer = new Sprite();
+		{	
+			supportContentContainer.y = maskSpriteHeight;
 			
-			/*			var whiteSquare:Sprite = new Sprite();
-			whiteSquare.graphics.beginFill(0xFFFFFF);
-			whiteSquare.graphics.drawRect(0,0,500,380);
-			whiteSquare.graphics.endFill();
-			contentContainer.addChild(whiteSquare);*/
-			contentContainer.y = 60;
-			addChild(contentContainer);
-			
-			contentContainer.cacheAsBitmap = true;
+			supportContentContainer.cacheAsBitmap = true;
 			maskSprite = event.maskSprite;
-			maskSprite.y = 60;
+			maskSprite.y = maskSpriteHeight;
 			
 			addChild(maskSprite);
-			contentContainer.mask = maskSprite;
+			supportContentContainer.mask = maskSprite;
 		}
 		
 		private function applyDropShadow(sprite:Sprite):void
@@ -151,6 +148,11 @@ package com.horizon.components
 			var filtersArray:Array = new Array(my_shadow);  
 			
 			sprite.filters = filtersArray;
+		}
+		
+		private function cleanUpSupportContent(event:Object):void
+		{
+			VisualizerUtils.removeChildren(supportContentContainer);
 		}
 		
 		private function removeDropShadow(sprite:Sprite):void

@@ -10,6 +10,7 @@ package com.horizon.utils
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.geom.Matrix;
+	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.net.FileReference;
 	import flash.net.URLLoader;
@@ -64,49 +65,58 @@ package com.horizon.utils
 				printJob.send();
 			}
 		}
-	
-	public static function copyBitmapData(bitmap:Bitmap):Bitmap
-	{
-		var copyBitmapData:BitmapData = bitmap.bitmapData;	
-		var copyBitmap:Bitmap = new Bitmap(copyBitmapData);
 		
-		return copyBitmap;
+		public static function copyBitmapData(bitmap:Bitmap):Bitmap
+		{
+			var copyBitmapData:BitmapData = bitmap.bitmapData;	
+			var copyBitmap:Bitmap = new Bitmap(copyBitmapData);
+			
+			return copyBitmap;
+		}
+		
+		public static function loadFrameImage():Loader
+		{
+			var imageLoader:Loader = new Loader();
+			var image:URLRequest = new URLRequest('assets/images/products/vis-embellishmentbox-img.png');
+			imageLoader.load(image);
+			
+			return imageLoader;
+		}
+		
+		public static function captureCreationArea(sprite1:Sprite, sprite2:Sprite):Bitmap
+		{
+			var currentCanvasBitmapData:BitmapData = new BitmapData(450, 450, true);
+			var area:Rectangle = new Rectangle(0, 0, 450, 450);
+			var croppedCanvasBitmapData:BitmapData;
+			var croppedCanvas:Bitmap;
+			
+			currentCanvasBitmapData.lock();
+			currentCanvasBitmapData.draw(sprite1, null, null, null, area, true);
+			currentCanvasBitmapData.draw(sprite2, null, null, null, area, true);
+			currentCanvasBitmapData.unlock();
+			
+			croppedCanvasBitmapData = new BitmapData(420, 400, false);
+			croppedCanvasBitmapData.lock();
+			croppedCanvasBitmapData.copyPixels(currentCanvasBitmapData, new Rectangle(40, 65, 420, 400), new Point(0,0));
+			croppedCanvas = new Bitmap(croppedCanvasBitmapData);
+			croppedCanvas.smoothing = true;
+			croppedCanvasBitmapData.unlock();
+			
+			croppedCanvas.x = 40;
+			croppedCanvas.y = 65;
+			
+			return croppedCanvas;
+		}
+		
+		public static function removeChildren(sprite:Sprite):void
+		{
+			var numChildren:int = sprite.numChildren - 1;
+			
+			if(numChildren==-1)
+				return;
+			
+			for(var i:int = numChildren; i>=0; i--)
+				sprite.removeChildAt(i);
+		}
 	}
-	
-	public static function loadFrameImage():Loader
-	{
-		var imageLoader:Loader = new Loader();
-		var image:URLRequest = new URLRequest('assets/images/products/vis-embellishmentbox-img.png');
-		imageLoader.load(image);
-		
-		return imageLoader;
-	}
-	
-	public static function captureCreationArea(sprite1:Sprite, sprite2:Sprite):Bitmap
-	{
-		var bmp:BitmapData = new BitmapData(450, 450, true);
-		var area:Rectangle = new Rectangle(10, 10, 450, 450);
-		var currentCanvas:BitmapData;
-		var croppedCanvas:Bitmap;
-		
-		bmp.draw(sprite1, null, null, null, area, true);
-		bmp.draw(sprite2, null, null, null, area, true);
-		
-		currentCanvas = bmp;
-		
-		croppedCanvas = VisualizerUtils.crop(10, 55, 450, 400, currentCanvas); 
-		croppedCanvas.y = 65;
-		croppedCanvas.x = 25;
-		
-		return croppedCanvas;
-	}
-	
-	public static function crop( _x:Number, _y:Number, _width:Number, _height:Number, bitmapData:BitmapData):Bitmap
-	{
-		var cropArea:Rectangle = new Rectangle( 0, 0, _width, _height );
-		var croppedBitmap:Bitmap = new Bitmap( new BitmapData( _width, _height ), PixelSnapping.ALWAYS, true );
-		croppedBitmap.bitmapData.draw(bitmapData, new Matrix(1, 0, 0, 1, -_x, -_y) , null, null, cropArea, true );
-		return croppedBitmap;
-	}
-}
 }

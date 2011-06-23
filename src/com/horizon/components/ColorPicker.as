@@ -1,9 +1,12 @@
 package com.horizon.components
 {
 	import com.horizon.events.ColorSwatchEvent;
+	import com.horizon.events.TilerEvent;
+	import com.horizon.utils.VisualizerUtils;
 	import com.sigmagroup.components.Tiler;
 	
 	import flash.display.Bitmap;
+	import flash.display.BitmapData;
 	import flash.display.Loader;
 	import flash.display.Sprite;
 	import flash.events.Event;
@@ -14,18 +17,29 @@ package com.horizon.components
 	
 	public class ColorPicker extends Tiler
 	{
-		private var previousContainer:Sprite = new Sprite;
+		private var previousContainer:Sprite;
 		private var isAnimating:Boolean = false;
-		private var bmMaskSprite:Sprite;
+		private var bmMaskSprite:Sprite = new Sprite();
 		private var colorBitmap:Bitmap;
+		private var previousBitmap:Bitmap;
+		private const surfaceY:int = 70;
 		
 		public function ColorPicker(vos:Vector.<Object>, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int=1, totalImages:int=0, displayNames:Boolean=false, scale:Number = 1, startingX:int = 0, startingY:int = 0)
 		{
 			initiateDisplayFunction = animateTiles;
-			contentContainer = new Sprite();
-			addChild(contentContainer);
+			createContainers();
 			super(vos, paginate, bitmap, imageWidth, imageHeight, horPadding, vertPadding, specifiedNumOfColumns, specifiedNumOfRows, totalImages, displayNames, scale, startingX, startingY);
 			loadColorImage();
+			addEventListener(TilerEvent.REPOPULATE, rePopulate);
+		}
+		
+		private function createContainers():void
+		{
+			previousContainer = new Sprite();
+			addChild(previousContainer);
+			previousContainer.y = surfaceY;
+			supportContentContainer = new Sprite();
+			addChild(supportContentContainer);
 		}
 		
 		override protected function imageDownHandler(event:MouseEvent):void
@@ -36,10 +50,18 @@ package com.horizon.components
 			assignCurrentSelected(event.currentTarget as Sprite);
 			
 			if(previouslySelected != currentSelected)
-				if(!currentVO.bmData)
-					loadColorImage();
-				else
-					displayColorImage();
+				checkIfBitmapDataAvailable()
+		}
+		
+		private function checkIfBitmapDataAvailable():void
+		{
+			if(!currentVO.bmData)
+				loadColorImage();
+			else
+			{
+				VisualizerUtils.removeChildren(supportContentContainer);
+				displayColorImage();
+			}
 		}
 		
 		private function loadColorImage():void
@@ -52,28 +74,28 @@ package com.horizon.components
 		
 		private function onLoadComplete(event:Event):void
 		{
-			var bm:Bitmap = event.currentTarget.content as Bitmap;
-			currentVO.bmData = bm.bitmapData;
+			currentVO.bmData = Bitmap(event.currentTarget.content).bitmapData;
+			VisualizerUtils.removeChildren(supportContentContainer);
 			displayColorImage();
 		}
 		
 		private function displayColorImage():void
 		{
-			previousContainer = contentContainer;
-			contentContainer = new Sprite();
-			addChild(contentContainer);
-			contentContainer.alpha = 0;
+			if(previousVO)
+			{
+				previousBitmap = new Bitmap(previousVO.bmData);
+				previousContainer.addChild(previousBitmap);
+			}
+			
+			supportContentContainer.alpha = 0;
 			colorBitmap = new Bitmap(currentVO.bmData);
 			colorBitmap.smoothing = true;
-			//colorBitmap.scaleX = .75;
-			//colorBitmap.scaleY = .75;
-			contentContainer.addChild(colorBitmap);
-			//colorBitmap.y = -colorBitmap.height + 25;
-			colorBitmap.y = 60;
-			TweenLite.to(contentContainer,.5, {alpha:1, onComplete:removePreviousContainer});
+			supportContentContainer.addChild(colorBitmap);
+			colorBitmap.y = surfaceY;
+			TweenLite.to(supportContentContainer,.5, {alpha:1, onComplete:removePreviousContainer});
 			isAnimating = true;
 			
-			if(!bmMaskSprite)
+			if(bmMaskSprite.numChildren==0)
 				createAndDisplayMask();
 		}
 		
@@ -83,32 +105,30 @@ package com.horizon.components
 			//bm.scaleX = .75;
 			//bm.scaleY = .75;
 			var maskBitmap:Bitmap = new Bitmap(currentVO.bmData);
-			bmMaskSprite = new Sprite();
 			bmMaskSprite.addChild(maskBitmap);
 			bmMaskSprite.cacheAsBitmap = true;
-		
 			
 			dispatchEvent(new ColorSwatchEvent(bmMaskSprite, ColorSwatchEvent.MASK_READY, true));
 			//addChild(bm);
 		}
 		override public function reAnimate(animateContentContainer:Boolean=true):void
 		{
-			removeChild(currentImagesContainer);
+			VisualizerUtils.removeChildren(currentImagesContainer);
 			animateTiles();
 			if(animateContentContainer)
-			animateImageContainer();
+				animateImageContainer();
 		}
 		
 		private function animateImageContainer():void
 		{
-			contentContainer.alpha = 0;
-			TweenLite.to(contentContainer,.5, {alpha:1});
+			supportContentContainer.alpha = 0;
+			TweenLite.to(supportContentContainer,.5, {alpha:1});
 		}
 		
 		private function removePreviousContainer():void
 		{
 			isAnimating = false;
-			removeChild(previousContainer);
+			VisualizerUtils.removeChildren(previousContainer);
 		}
 		
 		override public function animateTiles():void
@@ -117,50 +137,47 @@ package com.horizon.components
 			var currentHexString:String;
 			var currentHex:uint;
 			var currentSwatchHolder:Sprite;
-			var imageNumber:int = 0;
-			var currentY:int = 0;
-			var numOfColumns:int = specifiedNumOfColumns;
-			var numberOfSwatchesToAnimate:int = currentPageVosReference.length;
 			
-			currentImagesContainer = new Sprite();
-			addChild(currentImagesContainer);
-			currentImagesContainer.y = 50;
-			
-			for(var i:int = 1; i<=numOfRows; i++)
+			for (var a:int=0; a<specifiedNumOfColumns; a++)
 			{
-				currentY = ((i-1)*totalHeight) + startingY;
-				var tileDifference:int = (i*specifiedNumOfColumns) - numberOfSwatchesToAnimate;
+				currentSwatchHolder =  new Sprite();
+				currentSwatch = new Sprite();
 				
-				if(tileDifference > 0)
-					numOfColumns = specifiedNumOfColumns - tileDifference;
+				currentHexString = '0x' + currentPageVosReference[a].hex;
 				
-				for (var a:int=0; a<numOfColumns; a++)
-				{
-					currentSwatchHolder =  new Sprite();
-					currentSwatch = new Sprite();
-					
-					currentHexString = '0x' + currentPageVosReference[imageNumber].hex;
-					
-					currentHex = uint(currentHexString);
-					
-					currentSwatch.graphics.beginFill(currentHex);
-					currentSwatch.graphics.drawRect(0, 0, imageWidth, imageHeight);
-					currentSwatch.graphics.endFill();
-					
-					currentSwatchHolder.addChild(currentSwatch);
-					currentSwatchHolder.alpha = 0;
-					currentSwatchHolder.x = (a*totalWidth) + startingX;
-					currentSwatchHolder.y = currentY;
-					currentSwatchHolder.buttonMode = true;
-					//currentImageHolder.addEventListener(MouseEvent.MOUSE_OVER, imageOverHandler);
-					//currentImageHolder.addEventListener(MouseEvent.MOUSE_OUT, imageOutHandler);
-					currentSwatchHolder.addEventListener(MouseEvent.MOUSE_DOWN, imageDownHandler);
-					currentImagesContainer.addChild(currentSwatchHolder);
-					TweenLite.to(currentSwatchHolder,1, {alpha:1, delay:(.075*imageNumber)});
-					imageNumber++;
-				}
+				currentHex = uint(currentHexString);
+				
+				currentSwatch.graphics.beginFill(currentHex);
+				currentSwatch.graphics.drawRect(0, 0, imageWidth, imageHeight);
+				currentSwatch.graphics.endFill();
+				
+				currentSwatchHolder.addChild(currentSwatch);
+				currentSwatchHolder.alpha = 0;
+				currentSwatchHolder.x = (a*totalWidth) + currentImagesContainer.x;
+				currentSwatchHolder.buttonMode = true;
+				//currentImageHolder.addEventListener(MouseEvent.MOUSE_OVER, imageOverHandler);
+				//currentImageHolder.addEventListener(MouseEvent.MOUSE_OUT, imageOutHandler);
+				currentSwatchHolder.addEventListener(MouseEvent.MOUSE_DOWN, imageDownHandler);
+				currentImagesContainer.addChild(currentSwatchHolder);
+				TweenLite.to(currentSwatchHolder,1, {alpha:1, delay:(.075*a)});
 			}
+			//}
 			dispatchEvent(new Event(Event.COMPLETE));
+		}
+		
+		private function rePopulate(event:TilerEvent):void
+		{
+			this.vos = event.vos;
+			vosLength = vos.length;
+			specifiedNumOfColumns = 0;
+			VisualizerUtils.removeChildren(supportContentContainer);
+			VisualizerUtils.removeChildren(bmMaskSprite);
+			VisualizerUtils.removeChildren(currentImagesContainer);
+			currentIndex=0;
+			previousVO = null;
+			currentSelected = 0;
+			init();
+			checkIfBitmapDataAvailable();
 		}
 	}
 }

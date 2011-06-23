@@ -16,6 +16,8 @@ package com.horizon.events
 			this.maskSprite = maskSprite;
 		}
 		
-		//override clone method!!!!!!!!!!
+		override public function clone():Event {
+			return new ColorSwatchEvent(maskSprite, type);
+		}
 	}
 }

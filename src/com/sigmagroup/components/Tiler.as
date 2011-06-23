@@ -7,6 +7,9 @@
  */
 package com.sigmagroup.components
 {
+	import com.horizon.events.TilerEvent;
+	import com.horizon.utils.VisualizerUtils;
+	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
@@ -28,7 +31,7 @@ package com.sigmagroup.components
 	{
 		private var specifiedNumOfRows:int;
 		private var imagesPerPage:int;
-		private var tilesLoaded:int;
+		private var imagesLoaded:int;
 		private var horPadding:int;
 		private var vertPadding:int;
 		private var totalPages:int = 1;
@@ -38,22 +41,22 @@ package com.sigmagroup.components
 		private var bitmap:Boolean;
 		private var paginate:Boolean;
 		private var imageLoaders:Vector.<Loader>;
-		private var displayNames:Boolean;
 		private var pageVosReference:Array = new Array();
-		private var vos:Vector.<Object> = new Vector.<Object>;
+		private var maxAmountOfImages:int;
 		
 		public var currentSelected:int;
-		public var contentContainer:Sprite;
+		public var supportContentContainer:Sprite;
 		
-		protected var startingY:int;
-		protected var startingX:int;
+		protected var vos:Vector.<Object> = new Vector.<Object>;
+		protected var vosLength:int;
+		protected var displayNames:Boolean;
 		protected var previouslySelected:int;
 		protected var scale:Number;
 		protected var currentVO:Object;
+		protected var previousVO:Object;
 		protected var totalImages:int;
 		protected var imageWidth:int;
 		protected var imageHeight:int;
-		protected var numOfRows:int
 		protected var specifiedNumOfColumns:int;
 		protected var totalWidth:int;
 		protected var totalHeight:int;
@@ -62,7 +65,7 @@ package com.sigmagroup.components
 		protected var initiateDisplayFunction:Function;
 		protected var currentImagesContainer:Sprite;
 		
-		public function Tiler( vos:Vector.<Object>, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int = 1, totalImages:int = 0, displayNames:Boolean = false, scale:Number = 1, startingX:int = 0, startingY:int= 0)
+		public function Tiler( vos:Vector.<Object>, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int = 1, maxAmountofImages:int = 0, displayNames:Boolean = false, scale:Number = 1, startingX:int = 0, startingY:int= 0)
 		{
 			this.specifiedNumOfRows = specifiedNumOfRows;
 			this.specifiedNumOfColumns = specifiedNumOfColumns;
@@ -75,22 +78,23 @@ package com.sigmagroup.components
 			this.displayNames = displayNames;
 			this.scale = scale;
 			this.vos = vos;
-			this.startingX = startingX;
-			this.startingY = startingY;
-			
-			this.numOfRows = this.specifiedNumOfRows;
+			this.vosLength = vos.length;
 			this.imagesPerPage = specifiedNumOfRows * specifiedNumOfColumns;
 			this.totalWidth = imageWidth + horPadding;
 			this.totalHeight = imageHeight + vertPadding;
 			this.currentIndex = 0;
-			this.totalImages = totalImages;
+			this.totalImages = this.maxAmountOfImages = maxAmountofImages;
+			
+			createCurrentImagesContainer(startingX, startingY);
 			
 			init();
 		}
 		
-		private function init():void
+		protected function init():void
 		{	
 			checkAmountOfVos();
+			checkColumns();
+			checkRows();
 			
 			if(paginate)
 				totalPages = Math.ceil(totalImages/imagesPerPage);
@@ -98,12 +102,32 @@ package com.sigmagroup.components
 			setupPages();	
 		}
 		
+		private function createCurrentImagesContainer(xPos:int, yPos:int):void
+		{
+			currentImagesContainer = new Sprite();
+			currentImagesContainer.x = xPos;
+			currentImagesContainer.y = yPos;
+			addChild(currentImagesContainer);
+		}
+		
 		private function checkAmountOfVos():void
 		{
-			var amountVOs:int = vos.length;
-			
-			if(totalImages==0 || amountVOs < totalImages)
-				totalImages = amountVOs;
+			if(maxAmountOfImages==0 || vosLength < maxAmountOfImages)
+				totalImages = vosLength;
+			else
+				totalImages = maxAmountOfImages; 
+		}
+		
+		protected function checkColumns():void
+		{
+			if(specifiedNumOfColumns>totalImages || specifiedNumOfColumns==0)
+				specifiedNumOfColumns = totalImages;
+		}
+		
+		private function checkRows():void
+		{
+			if(specifiedNumOfRows>totalImages)
+				specifiedNumOfRows = totalImages;
 		}
 		
 		private function setupPages():void
@@ -176,10 +200,12 @@ package com.sigmagroup.components
 			myFormat.italic = true;  
 			tf.setTextFormat(myFormat);
 			
-			tfmc.x = (20*(pageNumber-1)) + startingX;
-			tfmc.y = startingY - 40;
+			tfmc.x = (20*(pageNumber-1)) + currentImagesContainer.x;
+			tfmc.y = currentImagesContainer.y - 40;
 			tfmc.addChild(tf);
-			tfmc.buttonMode = true;
+			tfmc.width = tf.width;
+			tfmc.height = tf.height;
+			tfmc.buttonMode = true
 			addChild(tfmc);
 		}
 		
@@ -191,7 +217,7 @@ package com.sigmagroup.components
 				currentPage = pageNumber;
 				currentPageVosReference = pageVosReference[currentPage];
 				
-				removeChild(currentImagesContainer);
+				VisualizerUtils.removeChildren(currentImagesContainer);
 				
 				if(currentPageVosReference[0].bmData)
 					animateTiles();
@@ -202,12 +228,12 @@ package com.sigmagroup.components
 		
 		private function onLoadComplete(event:Event):void
 		{
-			tilesLoaded++;
+			imagesLoaded++;
 			
-			if (tilesLoaded == numberOfImagesToLoadNext)
+			if (imagesLoaded == numberOfImagesToLoadNext)
 			{
 				storeBitmapData();
-				tilesLoaded = 0;
+				imagesLoaded = 0;
 				animateTiles();
 			}
 		}
@@ -221,7 +247,7 @@ package com.sigmagroup.components
 			}
 		}
 		
-		private function createLabel(imageNumber:int):TextField
+		protected function createLabel(imageNumber:int):TextField
 		{
 			var tf:TextField = new TextField();
 			tf.text = currentPageVosReference[imageNumber].displayName;
@@ -256,7 +282,7 @@ package com.sigmagroup.components
 		
 		public function reAnimate(animateContentContainer:Boolean = true):void
 		{
-			removeChild(currentImagesContainer);
+			VisualizerUtils.removeChildren(currentImagesContainer);
 			animateTiles();
 		}
 		protected function assignCurrentSelected(current:Sprite):void
@@ -265,7 +291,10 @@ package com.sigmagroup.components
 			currentSelected = currentImagesContainer.getChildIndex(current);
 			
 			if(previouslySelected != currentSelected)
-			currentVO = currentPageVosReference[currentSelected];
+			{
+				previousVO = currentVO;
+				currentVO = currentPageVosReference[currentSelected];
+			}
 		}
 		
 		//POSSIBLY OVERIDDEN METHODS
@@ -273,7 +302,7 @@ package com.sigmagroup.components
 		{
 			var filt:GlowFilter = new GlowFilter(0xff99cc, .5, 20, 20, 3, 2);  
 			var filtArray:Array = [filt];
-						
+			
 			var currentSprite:Sprite = event.currentTarget as Sprite;
 			currentSprite.filters = filtArray; 
 		}
@@ -285,17 +314,7 @@ package com.sigmagroup.components
 		}
 		
 		protected function imageDownHandler(event:MouseEvent):void{assignCurrentSelected(event.currentTarget as Sprite)};
-
-		public function createBorder(color:uint):DisplayObject
-		{
-			var border:Shape = new Shape();
-			border.graphics.lineStyle(1,color);
-			border.graphics.drawRect(0, 0, (imageWidth+2), (imageHeight+2));
-			border.x = -1;
-			border.y = -1;
-			
-			return border;
-		}
+		
 		
 		public function animateTiles():void
 		{
@@ -307,12 +326,9 @@ package com.sigmagroup.components
 			var numOfColumns:int = specifiedNumOfColumns;
 			var numberOfImagesToAnimate:int = currentPageVosReference.length;
 			
-			currentImagesContainer = new Sprite();
-			addChild(currentImagesContainer);
-			
-			for(var i:int = 1; i<=numOfRows; i++)
+			for(var i:int = 1; i<=specifiedNumOfRows; i++)
 			{
-				currentY = ((i-1)*(totalHeight*scale)) + startingY;
+				currentY = ((i-1)*(totalHeight*scale));
 				var tileDifference:int = (i*specifiedNumOfColumns) - numberOfImagesToAnimate;
 				
 				if(tileDifference > 0)
@@ -330,12 +346,11 @@ package com.sigmagroup.components
 					currentBitmap.smoothing = true;
 					currentImageHolder.addChild(currentBitmap);
 					currentImageHolder.alpha = 0;
-					currentImageHolder.x = (a*(totalWidth * scale)) + startingX;
+					currentImageHolder.x = (a*(totalWidth * scale));
 					currentImageHolder.y = currentY;
 					currentImageHolder.buttonMode = true;
 					currentBitmap.scaleX = scale;
 					currentBitmap.scaleY = scale;
-					//currentImageHolder.addChild(createBorder(0xCEA97B))
 					currentImageHolder.addEventListener(MouseEvent.MOUSE_OVER, imageOverHandler);
 					currentImageHolder.addEventListener(MouseEvent.MOUSE_OUT, imageOutHandler);
 					currentImageHolder.addEventListener(MouseEvent.MOUSE_DOWN, imageDownHandler);

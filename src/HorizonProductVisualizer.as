@@ -6,13 +6,13 @@ package
 	import com.horizon.components.ProductsGallery;
 	import com.horizon.components.SurfacesGallery;
 	import com.horizon.events.ColorSwatchEvent;
+	import com.horizon.events.ProductEvent;
+	import com.horizon.events.TilerEvent;
 	import com.horizon.model.VisualizerModel;
 	import com.horizon.utils.VisualizerUtils;
 	import com.horizon.utils.VisualizerVanity;
 	import com.horizon.utils.XmlUtil;
 	import com.sigmagroup.components.Tiler;
-	
-	import fl.controls.ComboBox;
 	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
@@ -26,23 +26,21 @@ package
 	
 	import gs.TweenLite;
 	
-	[SWF(width='902', height='515', backgroundColor='#ffffff', frameRate='30')]
+	[SWF(width='902', height='515', backgroundColor='#ffffff', frameRate='25')]
 	
 	public class HorizonProductVisualizer extends Sprite
 	{
 		private var surfacesGallery:Tiler;
 		private var productsGallery:Tiler;
 		private var colorSwatches:Tiler;
-		private var bitmapContainer:Sprite;
 		private var currentStateButton:MovieClip;
 		private var contentHolder:Sprite = new Sprite();
 		private var shellmc:mainshell;
 		private var savetodesktopButton:savetodesktopbutton;
 		private var sendtofriendButton:sendtofriendbutton;
 		private var snapshotBitmapData:BitmapData;
-		private var cBox:ComboBox = new ComboBox();
+		//private var cBox:ComboBox = new ComboBox();
 		private var visualizerModel:VisualizerModel;
-		private var currentCanvas:BitmapData;
 		private var productsFrame:Loader;
 		private var shellButtons:Sprite;
 		private var nextButton:assets.swfs.ui.nextButton;
@@ -50,13 +48,9 @@ package
 		private var previousState:String;
 		private var croppedCanvas:Bitmap;
 		private var animateContentContainer:Boolean;
-		private var currentSurface:int = -1;
+		private var currentSurface:int = 0;
 		private var printButton:assets.swfs.ui.printButton;
-		
-		private var swatchesXml:XML;
-		private var surfacesXml:XML;
-		private var productsXml:XML;
-		private var xmlLoader:XmlUtil;
+		private var xmlUtil:XmlUtil = new XmlUtil();
 		
 		public function HorizonProductVisualizer()
 		{
@@ -70,24 +64,31 @@ package
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.align = StageAlign.TOP_LEFT;
 			
-			shellmc = new mainshell();
-			addChild(shellmc);
+			displayShell();
+			addEventListeners();
 			assignMainButtonHandlers();
 			assignCurrentButton(shellmc.buttons.SelectASurface);
 			visualizerModel = VisualizerModel.getInstance();
 			initSurfacesGallery();
+			currentState = VisualizerVanity.SURFACES;
 			addChild(contentHolder);
 			createNextButton();
-			addEventListener(ColorSwatchEvent.MASK_READY, onMaskReady);
-			addEventListener('newSurfaceSelected', onSurfaceSelected);
 		}
 		
-		private function initSurfacesGallery():void{loadSurfacesXml('surfaces.xml')}
+		private function addEventListeners():void
+		{
+			addEventListener(ColorSwatchEvent.MASK_READY, onMaskReady);
+			addEventListener('newSurfaceSelected', onSurfaceSelected);
+			xmlUtil.addEventListener('surfacesXMLLoaded', createSurfacesGallery);
+			xmlUtil.addEventListener('productsXMLLoaded', createDesignView);
+		}
+		
+		private function initSurfacesGallery():void{xmlUtil.loadSurfacesXml('surfaces.xml')}
 		
 		private function initProductsGallery():void
 		{
-			if(!productsXml)
-				loadProductsXml('products.xml');
+			if(!visualizerModel.productsXml)
+				xmlUtil.loadProductsXml('products.xml');
 			else
 			{
 				createProductsGallery();
@@ -97,25 +98,26 @@ package
 		//NAVIGATING STATE CHANGES
 		private function displayPageContent(name:String):void
 		{
-			removeChild(contentHolder);
-			contentHolder = new Sprite();
+			VisualizerUtils.removeChildren(contentHolder);
 			
 			previousState = currentState;
 			currentState = name;
 			
 			if(previousState == VisualizerVanity.PUBLISH)
 			{
-				removeChild(croppedCanvas); 
+				removeChild(croppedCanvas);
 				animateContentContainer = false;
 			}
+			else
+				animateContentContainer = true;
+			
+			currentState == VisualizerVanity.PUBLISH ? nextButton.visible = false : nextButton.visible = true;
 			
 			switch(name){
 				case VisualizerVanity.SURFACES:
 					createSurfacesGallery();
 					break;
 				case VisualizerVanity.DESIGN:
-					if(previousState != VisualizerVanity.PUBLISH)
-						animateContentContainer = true;	
 					initProductsGallery();
 					break;
 				case VisualizerVanity.PUBLISH:
@@ -124,7 +126,6 @@ package
 					animateContentHolder();
 					break; 
 			}
-			addChild(contentHolder);
 		}
 		
 		private function displayTheProductsGallery():void
@@ -135,14 +136,14 @@ package
 			//contentHolder.addChild(cBox);
 		}
 		
-		private function displayDifferentCategory(event:Event):void
+		/*		private function displayDifferentCategory(event:Event):void
 		{
-			trace(event.currentTarget.selectedIndex);
-		}
+		trace(event.currentTarget.selectedIndex);
+		}*/
 		
 		private function displayCroppedCanvas():void
 		{
-			this.croppedCanvas = VisualizerUtils.captureCreationArea(colorSwatches, productsGallery);
+			croppedCanvas = VisualizerUtils.captureCreationArea(colorSwatches, productsGallery);
 			addChild(croppedCanvas);
 		}
 		
@@ -152,53 +153,20 @@ package
 			TweenLite.to(contentHolder,.5, {alpha:1});
 		}
 		
-		//XML LOADING
-		private function loadSurfacesXml(url:String):void
+		private function createDesignView(event:Object):void
 		{
-			xmlLoader = new XmlUtil();
-			xmlLoader.loadXml(url);
-			xmlLoader.addEventListener(Event.COMPLETE, surfacesXmlLoaded);
-		}
-		private function surfacesXmlLoaded(event:Event):void
-		{
-			xmlLoader.removeEventListener(Event.COMPLETE, surfacesXmlLoaded);
-			surfacesXml = xmlLoader.content;
-			visualizerModel.surfacesVOsReference = xmlLoader.generateSurfacesVOsReference(surfacesXml);
-			createSurfacesGallery();
-			generateSwatchesVosReference();
-		}
-		
-		private function loadProductsXml(url:String):void
-		{
-			xmlLoader.loadXml(url);
-			xmlLoader.addEventListener(Event.COMPLETE, productsXmlLoaded);
-		}
-		
-		private function productsXmlLoaded(event:Event):void
-		{
-			xmlLoader.removeEventListener(Event.COMPLETE, productsXmlLoaded)
-			productsXml = xmlLoader.content;
-			visualizerModel.productsVOsReference = xmlLoader.generateProductsVOsReference(productsXml);
 			createProductsFrame();
 			createProductsGallery();
 			createColorSwatches();
 			enablePublishButton();
-		}		
-		
-		private function generateSwatchesVosReference():void
-		{
-			var surfacesLength:int = surfacesXml.surface.length();	
-			
-			for (var i:int = 0; i<surfacesLength; i++)
-			{
-				var item:XMLList = surfacesXml.surface[i].item;
-				var newXML:XML = xmlLoader.convertXmlListToXML(item);
-				var voVector:Vector.<Object> = xmlLoader.generateColorSwatchesVOsReference(newXML);
-				
-				visualizerModel.colorPickerVOsReference.push(voVector);
-			}
 		}
-		//BUTTONS
+		//SHELL AND BUTTONS
+		private function displayShell():void
+		{
+			shellmc = new mainshell();
+			addChild(shellmc);
+		}
+		
 		private function assignMainButtonHandlers():void
 		{
 			shellButtons = shellmc.buttons as Sprite;
@@ -213,8 +181,25 @@ package
 		private function createNextButton():void
 		{
 			this.nextButton = new assets.swfs.ui.nextButton();
-			nextButton.x = 400;
-			nextButton.y  = 500;
+			nextButton.x = 775;
+			nextButton.y  = 450;
+			addChild(nextButton);
+			nextButton.addEventListener(MouseEvent.MOUSE_DOWN, nextDown);
+		}
+		
+		private function nextDown(event:Object):void
+		{
+			reConfigurePreviousButton();
+			if(currentState == VisualizerVanity.SURFACES)
+			{
+				assignCurrentButton(shellButtons[VisualizerVanity.DESIGN]);
+				displayPageContent(VisualizerVanity.DESIGN);
+			}
+			else if(currentState == VisualizerVanity.DESIGN)
+			{
+				assignCurrentButton(shellButtons[VisualizerVanity.PUBLISH]);
+				displayPageContent(VisualizerVanity.PUBLISH);
+			}
 		}
 		
 		private function configShellButton(currentButton:MovieClip):void
@@ -296,11 +281,11 @@ package
 		private function stepButtonOverHandler(event:MouseEvent):void{event.currentTarget.gotoAndStop('down')}
 		private function stepButtonOutHandler(event:MouseEvent):void{event.currentTarget.gotoAndStop('up')}
 		//COMPONENT CREATION
-		private function createSurfacesGallery():void
+		private function createSurfacesGallery(event:Object=null):void
 		{
 			if(!surfacesGallery)
 			{
-				surfacesGallery = new SurfacesGallery(visualizerModel.surfacesVOsReference, false, true, 154, 125, 10, 10, 5, 1, 5, true, 1, 45, 75);
+				surfacesGallery = new SurfacesGallery(visualizerModel.surfacesVOsReference, false, true, 150, 170, 10, 10, 5, 1, 5, true, 1, 30, 75);
 				contentHolder.addChild(surfacesGallery);
 				surfacesGallery.buttonMode = true;
 			}
@@ -334,23 +319,33 @@ package
 		
 		private function createColorSwatches():void
 		{
+			var currentVOs:Vector.<Object> = visualizerModel.colorPickerVOsReference[surfacesGallery.currentSelected];
+			
+			if(!colorSwatches)
+			{
+				instantiateColorSwatchComponent(currentVOs);
+				currentSurface = surfacesGallery.currentSelected;
+				setProductsIndex();
+				return;
+			}
+			
 			if(currentSurface != surfacesGallery.currentSelected)
 			{	
+				productsGallery.dispatchEvent(new TilerEvent(TilerEvent.CLEANUP_CONTENT));
+				colorSwatches.dispatchEvent(new TilerEvent(TilerEvent.REPOPULATE, false, false, currentVOs));
 				currentSurface = surfacesGallery.currentSelected;
-				var currentSurfaceVOs:Vector.<Object> = visualizerModel.colorPickerVOsReference[currentSurface];
-				
-				colorSwatches = new ColorPicker(currentSurfaceVOs, false, false, 25, 25, 5, 5, 8, 1, 8, false, 1, 10, 415);
-				contentHolder.addChild(colorSwatches);
-				colorSwatches.buttonMode = true;
-				
-				productsGallery.removeChild(productsGallery.contentContainer);
 			}
 			else
-			{
 				colorSwatches.reAnimate(animateContentContainer);
-				contentHolder.addChild(colorSwatches)
-			}
+			
+			contentHolder.addChild(colorSwatches);
 			setProductsIndex();
+		}
+		
+		private function instantiateColorSwatchComponent(currentSurfaceVOs:Vector.<Object>):void
+		{
+			colorSwatches = new ColorPicker(currentSurfaceVOs, false, false, 25, 25, 5, 5, 0, 1, 8, false, 1, 20, 500);
+			contentHolder.addChild(colorSwatches);
 		}
 		
 		private function setProductsIndex():void{contentHolder.swapChildren(productsGallery, colorSwatches)}
@@ -364,8 +359,8 @@ package
 		private function createProductsFrame():void
 		{
 			productsFrame = VisualizerUtils.loadFrameImage();
-			productsFrame.x = 484;
-			productsFrame.y = 79;
+			productsFrame.x = 500;
+			productsFrame.y = 100;
 		}
 		//EVENT TRANSFER
 		private function onMaskReady(event:ColorSwatchEvent):void

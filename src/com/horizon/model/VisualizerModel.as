@@ -8,7 +8,40 @@ package com.horizon.model
 		private var _productsVOsReference:Vector.<Object>;
 		private static var instance:VisualizerModel;
 		private static var allowInstantiation:Boolean;
+		private var _swatchesXml:XML;
+		private var _surfacesXml:XML;
+		private var _productsXml:XML;
 		
+		public function get productsXml():XML
+		{
+			return _productsXml;
+		}
+
+		public function set productsXml(value:XML):void
+		{
+			_productsXml = value;
+		}
+
+		public function get surfacesXml():XML
+		{
+			return _surfacesXml;
+		}
+
+		public function set surfacesXml(value:XML):void
+		{
+			_surfacesXml = value;
+		}
+
+		public function get swatchesXml():XML
+		{
+			return _swatchesXml;
+		}
+
+		public function set swatchesXml(value:XML):void
+		{
+			_swatchesXml = value;
+		}
+
 		public function VisualizerModel():void 
 		{
 			if (!allowInstantiation) 

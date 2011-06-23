@@ -14,5 +14,9 @@ package com.horizon.events
 			super(type, bubbles, cancelable);
 			this.currentProduct = currentProduct;
 		}
+		
+		override public function clone():Event {
+			return new ProductEvent(currentProduct, type);
+		}
 	}
 }
