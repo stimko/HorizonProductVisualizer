@@ -72,13 +72,13 @@ package com.horizon.utils
 		public function generateProductsVOsReference(xml:XML):Vector.<Object>
 		{
 			var voarray:Vector.<Object> = new Vector.<Object>;
-			var xmlLength:int = xml.client.length();
+			var xmlLength:int = xml.product.length();
 			
 			for (var i:int = 0; i<xmlLength; i++)
 			{
 				var pVO:Object = new ProductsVO();
-				pVO.url = xml.client[i].@imageurl;
-				pVO.size = xml.client[i].@size;
+				pVO.url = 'http://fashionartstage.sigmagroup.com/'+xml.product[i].@imagesrc;
+				pVO.size = xml.product[i].@size;
 				voarray.push(pVO);
 			}	
 			return voarray;

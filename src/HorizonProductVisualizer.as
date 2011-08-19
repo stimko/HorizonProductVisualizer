@@ -39,7 +39,6 @@ package
 		private var savetodesktopButton:savetodesktopbutton;
 		private var sendtofriendButton:sendtofriendbutton;
 		private var snapshotBitmapData:BitmapData;
-		//private var cBox:ComboBox = new ComboBox();
 		private var visualizerModel:VisualizerModel;
 		private var productsFrame:Loader;
 		private var shellButtons:Sprite;
@@ -51,12 +50,13 @@ package
 		private var currentSurface:int = 0;
 		private var printButton:assets.swfs.ui.printButton;
 		private var xmlUtil:XmlUtil = new XmlUtil();
+		//private var cBox:ComboBox = new ComboBox();
 		
 		public function HorizonProductVisualizer()
 		{
 			stage ? init() : addEventListener(Event.ADDED_TO_STAGE, init);
 		}
-		//INITIALIZATION
+		
 		private function init():void
 		{
 			if(hasEventListener(Event.ADDED_TO_STAGE))removeEventListener(Event.ADDED_TO_STAGE, init);
@@ -69,10 +69,10 @@ package
 			assignMainButtonHandlers();
 			assignCurrentButton(shellmc.buttons.SelectASurface);
 			visualizerModel = VisualizerModel.getInstance();
-			initSurfacesGallery();
 			currentState = VisualizerVanity.SURFACES;
 			addChild(contentHolder);
 			createNextButton();
+			initSurfacesGallery();
 		}
 		
 		private function addEventListeners():void
@@ -88,7 +88,7 @@ package
 		private function initProductsGallery():void
 		{
 			if(!visualizerModel.productsXml)
-				xmlUtil.loadProductsXml('products.xml');
+				xmlUtil.loadProductsXml('http://fashionartstage.sigmagroup.com/visualizer.php?view=products');
 			else
 			{
 				createProductsGallery();
@@ -136,11 +136,6 @@ package
 			//contentHolder.addChild(cBox);
 		}
 		
-		/*		private function displayDifferentCategory(event:Event):void
-		{
-		trace(event.currentTarget.selectedIndex);
-		}*/
-		
 		private function displayCroppedCanvas():void
 		{
 			croppedCanvas = VisualizerUtils.captureCreationArea(colorSwatches, productsGallery);
@@ -183,6 +178,7 @@ package
 			this.nextButton = new assets.swfs.ui.nextButton();
 			nextButton.x = 775;
 			nextButton.y  = 450;
+			nextButton.buttonMode = true;
 			addChild(nextButton);
 			nextButton.addEventListener(MouseEvent.MOUSE_DOWN, nextDown);
 		}
@@ -285,7 +281,7 @@ package
 		{
 			if(!surfacesGallery)
 			{
-				surfacesGallery = new SurfacesGallery(visualizerModel.surfacesVOsReference, false, true, 150, 170, 10, 10, 5, 1, 5, true, 1, 30, 75);
+				surfacesGallery = new SurfacesGallery(visualizerModel.surfacesVOsReference, false, true, 150, 170, 10, 10, 5, 1, 5, true, 1, 50, 160);
 				contentHolder.addChild(surfacesGallery);
 				surfacesGallery.buttonMode = true;
 			}
@@ -300,18 +296,10 @@ package
 		{
 			if(!productsGallery)
 			{
-				productsGallery = new ProductsGallery(visualizerModel.productsVOsReference,true, true, 96, 96, 5, 5, 3, 3, 0, false, 1, 500, 100);
+				productsGallery = new ProductsGallery(visualizerModel.productsVOsReference,true, true, 96, 96, 18, 18, 5, 5, 0, false, .5, 510, 110);
 				contentHolder.addChild(productsFrame);
 				contentHolder.addChild(productsGallery);
 				productsGallery.buttonMode = true;
-				
-				/*				var dummyarray:Array = ['hello', 'hi', 'shark'];
-				var dp:DataProvider = new DataProvider(dummyarray);
-				cBox.dataProvider = dp;
-				cBox.x = 200;
-				cBox.y = 200;
-				cBox.addEventListener(Event.CHANGE, displayDifferentCategory);
-				contentHolder.addChild(cBox);*/
 			}
 			else
 				displayTheProductsGallery();
@@ -344,7 +332,7 @@ package
 		
 		private function instantiateColorSwatchComponent(currentSurfaceVOs:Vector.<Object>):void
 		{
-			colorSwatches = new ColorPicker(currentSurfaceVOs, false, false, 25, 25, 5, 5, 0, 1, 8, false, 1, 20, 500);
+			colorSwatches = new ColorPicker(currentSurfaceVOs, false, false, 25, 25, 5, 5, 0, 1, 8, false, 1, 20, 456);
 			contentHolder.addChild(colorSwatches);
 		}
 		
@@ -359,8 +347,8 @@ package
 		private function createProductsFrame():void
 		{
 			productsFrame = VisualizerUtils.loadFrameImage();
-			productsFrame.x = 500;
-			productsFrame.y = 100;
+			productsFrame.x = 475;
+			productsFrame.y = 73;
 		}
 		//EVENT TRANSFER
 		private function onMaskReady(event:ColorSwatchEvent):void

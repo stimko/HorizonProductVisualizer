@@ -1,24 +1,105 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Root xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-<client name = "ciao bella" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-swallow-img.png"/>
-<client name = "delonghi" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-princessheart-img.png"/>
-<client name = "famous footwear" size="medium" hex ="000000" imageurl = "assets/images/products/vis-emb-orangeflower-img.png"/>
-<client name = "horizon" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-milwingsbrown-img.png"/>
-<client name = "hunter douglas" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-love-img.png"/>
-<client name = "panasonic" size="medium" hex ="000000" imageurl = "assets/images/products/vis-emb-crossbutterfly-img.png"/>
-<client name = "seiko" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-butterfly-img.png"/>
-<client name = "siemens" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-brownheart-img.png"/>
-<client name = "waterjel" size="medium" imageurl = "assets/images/products/vis-emb-boxitembkgd-img.png"/>
-<client name = "jets" size="large" imageurl = "assets/images/products/vis-emb-batman-img.png"/>
-<client name = "ciao bella" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-swallow-img.png"/>
-<client name = "delonghi" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-princessheart-img.png"/>
-<client name = "famous footwear" size="medium" hex ="000000" imageurl = "assets/images/products/vis-emb-orangeflower-img.png"/>
-<client name = "horizon" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-milwingsbrown-img.png"/>
-<client name = "hunter douglas" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-love-img.png"/>
-<client name = "panasonic" size="medium" hex ="000000" imageurl = "assets/images/products/vis-emb-crossbutterfly-img.png"/>
-<client name = "seiko" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-butterfly-img.png"/>
-<client name = "siemens" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-brownheart-img.png"/>
-<client name = "waterjel" size="medium" imageurl = "assets/images/products/vis-emb-boxitembkgd-img.png"/>
-<client name = "jets" size="large" imageurl = "assets/images/products/vis-emb-batman-img.png"/>
+<product name = "ciao bella" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-swallow-img.png"/>
+<product name = "delonghi" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-princessheart-img.png"/>
+<product name = "famous footwear" size="medium" hex ="000000" imageurl = "assets/images/products/vis-emb-orangeflower-img.png"/>
+<product name = "horizon" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-milwingsbrown-img.png"/>
+<product name = "hunter douglas" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-love-img.png"/>
+<product name = "panasonic" size="medium" hex ="000000" imageurl = "assets/images/products/vis-emb-crossbutterfly-img.png"/>
+<product name = "seiko" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-butterfly-img.png"/>
+<product name = "siemens" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-brownheart-img.png"/>
+<product name = "waterjel" size="medium" imageurl = "assets/images/products/vis-emb-boxitembkgd-img.png"/>
+<product name = "jets" size="large" imageurl = "assets/images/products/vis-emb-batman-img.png"/>
+<product name = "ciao bella" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-swallow-img.png"/>
+<product name = "delonghi" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-princessheart-img.png"/>
+<product name = "famous footwear" size="medium" hex ="000000" imageurl = "assets/images/products/vis-emb-orangeflower-img.png"/>
+<product name = "horizon" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-milwingsbrown-img.png"/>
+<product name = "hunter douglas" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-love-img.png"/>
+<product name = "panasonic" size="medium" hex ="000000" imageurl = "assets/images/products/vis-emb-crossbutterfly-img.png"/>
+<product name = "seiko" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-butterfly-img.png"/>
+<product name = "siemens" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-brownheart-img.png"/>
+<product name = "waterjel" size="medium" imageurl = "assets/images/products/vis-emb-boxitembkgd-img.png"/>
+<product name = "jets" size="large" imageurl = "assets/images/products/vis-emb-batman-img.png"/>
+<product name = "ciao bella" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-swallow-img.png"/>
+<product name = "delonghi" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-princessheart-img.png"/>
+<product name = "famous footwear" size="medium" hex ="000000" imageurl = "assets/images/products/vis-emb-orangeflower-img.png"/>
+<product name = "horizon" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-milwingsbrown-img.png"/>
+<product name = "hunter douglas" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-love-img.png"/>
+<product name = "panasonic" size="medium" hex ="000000" imageurl = "assets/images/products/vis-emb-crossbutterfly-img.png"/>
+<product name = "seiko" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-butterfly-img.png"/>
+<product name = "siemens" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-brownheart-img.png"/>
+<product name = "waterjel" size="medium" imageurl = "assets/images/products/vis-emb-boxitembkgd-img.png"/>
+<product name = "jets" size="large" imageurl = "assets/images/products/vis-emb-batman-img.png"/>
+<product name = "ciao bella" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-swallow-img.png"/>
+<product name = "delonghi" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-princessheart-img.png"/>
+<product name = "famous footwear" size="medium" hex ="000000" imageurl = "assets/images/products/vis-emb-orangeflower-img.png"/>
+<product name = "horizon" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-milwingsbrown-img.png"/>
+<product name = "hunter douglas" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-love-img.png"/>
+<product name = "panasonic" size="medium" hex ="000000" imageurl = "assets/images/products/vis-emb-crossbutterfly-img.png"/>
+<product name = "seiko" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-butterfly-img.png"/>
+<product name = "siemens" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-brownheart-img.png"/>
+<product name = "waterjel" size="medium" imageurl = "assets/images/products/vis-emb-boxitembkgd-img.png"/>
+<product name = "jets" size="large" imageurl = "assets/images/products/vis-emb-batman-img.png"/>
+<product name = "ciao bella" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-swallow-img.png"/>
+<product name = "delonghi" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-princessheart-img.png"/>
+<product name = "famous footwear" size="medium" hex ="000000" imageurl = "assets/images/products/vis-emb-orangeflower-img.png"/>
+<product name = "horizon" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-milwingsbrown-img.png"/>
+<product name = "hunter douglas" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-love-img.png"/>
+<product name = "panasonic" size="medium" hex ="000000" imageurl = "assets/images/products/vis-emb-crossbutterfly-img.png"/>
+<product name = "seiko" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-butterfly-img.png"/>
+<product name = "siemens" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-brownheart-img.png"/>
+<product name = "waterjel" size="medium" imageurl = "assets/images/products/vis-emb-boxitembkgd-img.png"/>
+<product name = "jets" size="large" imageurl = "assets/images/products/vis-emb-batman-img.png"/>
+<product name = "ciao bella" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-swallow-img.png"/>
+<product name = "delonghi" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-princessheart-img.png"/>
+<product name = "famous footwear" size="medium" hex ="000000" imageurl = "assets/images/products/vis-emb-orangeflower-img.png"/>
+<product name = "horizon" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-milwingsbrown-img.png"/>
+<product name = "hunter douglas" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-love-img.png"/>
+<product name = "panasonic" size="medium" hex ="000000" imageurl = "assets/images/products/vis-emb-crossbutterfly-img.png"/>
+<product name = "seiko" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-butterfly-img.png"/>
+<product name = "siemens" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-brownheart-img.png"/>
+<product name = "waterjel" size="medium" imageurl = "assets/images/products/vis-emb-boxitembkgd-img.png"/>
+<product name = "jets" size="large" imageurl = "assets/images/products/vis-emb-batman-img.png"/>
+<product name = "ciao bella" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-swallow-img.png"/>
+<product name = "delonghi" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-princessheart-img.png"/>
+<product name = "famous footwear" size="medium" hex ="000000" imageurl = "assets/images/products/vis-emb-orangeflower-img.png"/>
+<product name = "horizon" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-milwingsbrown-img.png"/>
+<product name = "hunter douglas" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-love-img.png"/>
+<product name = "panasonic" size="medium" hex ="000000" imageurl = "assets/images/products/vis-emb-crossbutterfly-img.png"/>
+<product name = "seiko" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-butterfly-img.png"/>
+<product name = "siemens" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-brownheart-img.png"/>
+<product name = "waterjel" size="medium" imageurl = "assets/images/products/vis-emb-boxitembkgd-img.png"/>
+<product name = "jets" size="large" imageurl = "assets/images/products/vis-emb-batman-img.png"/>
+<product name = "ciao bella" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-swallow-img.png"/>
+<product name = "delonghi" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-princessheart-img.png"/>
+<product name = "famous footwear" size="medium" hex ="000000" imageurl = "assets/images/products/vis-emb-orangeflower-img.png"/>
+<product name = "horizon" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-milwingsbrown-img.png"/>
+<product name = "hunter douglas" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-love-img.png"/>
+<product name = "panasonic" size="medium" hex ="000000" imageurl = "assets/images/products/vis-emb-crossbutterfly-img.png"/>
+<product name = "seiko" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-butterfly-img.png"/>
+<product name = "siemens" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-brownheart-img.png"/>
+<product name = "waterjel" size="medium" imageurl = "assets/images/products/vis-emb-boxitembkgd-img.png"/>
+<product name = "jets" size="large" imageurl = "assets/images/products/vis-emb-batman-img.png"/>
+<product name = "ciao bella" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-swallow-img.png"/>
+<product name = "delonghi" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-princessheart-img.png"/>
+<product name = "famous footwear" size="medium" hex ="000000" imageurl = "assets/images/products/vis-emb-orangeflower-img.png"/>
+<product name = "horizon" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-milwingsbrown-img.png"/>
+<product name = "hunter douglas" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-love-img.png"/>
+<product name = "panasonic" size="medium" hex ="000000" imageurl = "assets/images/products/vis-emb-crossbutterfly-img.png"/>
+<product name = "seiko" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-butterfly-img.png"/>
+<product name = "siemens" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-brownheart-img.png"/>
+<product name = "waterjel" size="medium" imageurl = "assets/images/products/vis-emb-boxitembkgd-img.png"/>
+<product name = "jets" size="large" imageurl = "assets/images/products/vis-emb-batman-img.png"/>
+<product name = "ciao bella" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-swallow-img.png"/>
+<product name = "delonghi" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-princessheart-img.png"/>
+<product name = "famous footwear" size="medium" hex ="000000" imageurl = "assets/images/products/vis-emb-orangeflower-img.png"/>
+<product name = "horizon" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-milwingsbrown-img.png"/>
+<product name = "hunter douglas" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-love-img.png"/>
+<product name = "panasonic" size="medium" hex ="000000" imageurl = "assets/images/products/vis-emb-crossbutterfly-img.png"/>
+<product name = "seiko" size="large" hex ="000000" imageurl = "assets/images/products/vis-emb-butterfly-img.png"/>
+<product name = "siemens" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-brownheart-img.png"/>
+<product name = "waterjel" size="medium" imageurl = "assets/images/products/vis-emb-boxitembkgd-img.png"/>
+<product name = "jets" size="large" imageurl = "assets/images/products/vis-emb-batman-img.png"/>
+<product name = "ciao bella" size="small" hex ="000000" imageurl = "assets/images/products/vis-emb-swallow-img.png"/>
 </Root>

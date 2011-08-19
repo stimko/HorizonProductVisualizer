@@ -8,30 +8,34 @@
 <item imagesrc="assets/images/surfaces/vis-tshirt-pink.png" hex="000000" name="Test 1" id="1"/>
 </surface>
 <surface name="Shirt" thumb="assets/images/thumbs/vis-tshirt-thumb.jpg" id="31">
+<item imagesrc="assets/images/surfaces/vis-tshirt-blue.png" hex="666666" name="test2" id="2"/>
 <item imagesrc="assets/images/surfaces/vis-tshirt-pink.png" hex="000000" name="Test 1" id="1"/>
 <item imagesrc="assets/images/surfaces/vis-tshirt-blue.png" hex="666666" name="test2" id="2"/>
 <item imagesrc="assets/images/surfaces/vis-tshirt-black.png" hex="223455" name="Test 1" id="1"/>
 <item imagesrc="assets/images/surfaces/vis-tshirt-tan.png" hex="223455" name="test2" id="2"/>
 <item imagesrc="assets/images/surfaces/vis-tshirt-pink.png" hex="000000" name="Test 1" id="1"/>
-<item imagesrc="assets/images/surfaces/vis-tshirt-blue.png" hex="666666" name="test2" id="2"/>
 </surface>
 <surface name="Apron" thumb="assets/images/thumbs/vis-apron-thumb.jpg" id="31">
+<item imagesrc="assets/images/surfaces/vis-tshirt-black.png" hex="223455" name="Test 1" id="1"/>
 <item imagesrc="assets/images/surfaces/vis-tshirt-pink.png" hex="000000" name="Test 1" id="1"/>
 <item imagesrc="assets/images/surfaces/vis-tshirt-blue.png" hex="666666" name="test2" id="2"/>
-<item imagesrc="assets/images/surfaces/vis-tshirt-black.png" hex="223455" name="Test 1" id="1"/>
 <item imagesrc="assets/images/surfaces/vis-tshirt-tan.png" hex="223455" name="test2" id="2"/>
 <item imagesrc="assets/images/surfaces/vis-tshirt-pink.png" hex="000000" name="Test 1" id="1"/>
 <item imagesrc="assets/images/surfaces/vis-tshirt-blue.png" hex="666666" name="test2" id="2"/>
 <item imagesrc="assets/images/surfaces/vis-tshirt-black.png" hex="223455" name="Test 1" id="1"/>
 </surface>
 <surface name="Bandana" thumb="assets/images/thumbs/vis-bandanas-thumb.jpg" id="31">
+<item imagesrc="assets/images/surfaces/vis-tshirt-blue.png" hex="666666" name="test2" id="2"/>
+<item imagesrc="assets/images/surfaces/vis-tshirt-pink.png" hex="000000" name="Test 1" id="1"/>
+<item imagesrc="assets/images/surfaces/vis-tshirt-black.png" hex="223455" name="Test 1" id="1"/>
 <item imagesrc="assets/images/surfaces/vis-tshirt-pink.png" hex="000000" name="Test 1" id="1"/>
 <item imagesrc="assets/images/surfaces/vis-tshirt-blue.png" hex="666666" name="test2" id="2"/>
 <item imagesrc="assets/images/surfaces/vis-tshirt-black.png" hex="223455" name="Test 1" id="1"/>
 <item imagesrc="assets/images/surfaces/vis-tshirt-tan.png" hex="223455" name="test2" id="2"/>
+</surface>
+<surface name="Tote" thumb="assets/images/thumbs/vis-apron-thumb.jpg" id="31">
+<item imagesrc="assets/images/surfaces/vis-tshirt-tan.png" hex="223455" name="test2" id="2"/>
 <item imagesrc="assets/images/surfaces/vis-tshirt-pink.png" hex="000000" name="Test 1" id="1"/>
 <item imagesrc="assets/images/surfaces/vis-tshirt-blue.png" hex="666666" name="test2" id="2"/>
-<item imagesrc="assets/images/surfaces/vis-tshirt-black.png" hex="223455" name="Test 1" id="1"/>
-<item imagesrc="assets/images/surfaces/vis-tshirt-tan.png" hex="223455" name="test2" id="2"/>
 </surface>
 </Root>

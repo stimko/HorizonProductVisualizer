@@ -1,5 +1,7 @@
 package com.horizon.components
 {
+	import assets.swfs.ui.clearSurfaceButton;
+	
 	import com.horizon.events.ColorSwatchEvent;
 	import com.horizon.events.TilerEvent;
 	import com.horizon.utils.VisualizerUtils;
@@ -25,6 +27,7 @@ package com.horizon.components
 			addEventListener(TilerEvent.CLEANUP_CONTENT, cleanUpSupportContent);
 			supportContentContainer = new Sprite();
 			addChild(supportContentContainer);
+			createClearSurfaceButton();
 			super(vos, paginate, bitmap, imageWidth, imageHeight, horPadding, vertPadding, specifiedNumOfColumns, specifiedNumOfRows, totalImages, displayNames, scale, startingX, startingY);
 		}
 		
@@ -38,6 +41,21 @@ package com.horizon.components
 			var currentImage:Sprite = event.currentTarget as Sprite;
 			currentImage.removeChild(currentImage.getChildAt(currentImage.numChildren-1));	
 		}*/
+		
+		private function createClearSurfaceButton():void
+		{
+			var clearButton:clearSurfaceButton = new clearSurfaceButton();
+			clearButton.x = 350;
+			clearButton.y = 460;
+			addChild(clearButton);
+			clearButton.addEventListener(MouseEvent.CLICK, clearTheSurface);
+		}
+		
+		private function clearTheSurface(event:MouseEvent):void
+		{
+			while(supportContentContainer.numChildren>0)
+				supportContentContainer.removeChildAt(0)
+		}
 		
 		override protected function imageDownHandler(event:MouseEvent):void
 		{
@@ -110,11 +128,11 @@ package com.horizon.components
 		private function ceaseDraggage(event:MouseEvent):void
 		{
 			removeMouseListeners();
-			bitmapContainer.stopDrag();	
-			bitmapContainer.y -= maskSpriteHeight;
 			removeDropShadow(bitmapContainer);
-			supportContentContainer.addChild(bitmapContainer);
+			bitmapContainer.stopDrag();
+			bitmapContainer.y -= maskSpriteHeight;
 			bitmapContainer.addEventListener(MouseEvent.MOUSE_DOWN, productMouseDown);
+			supportContentContainer.addChild(bitmapContainer);
 		}
 		
 		private function removeMouseListeners():void
@@ -157,7 +175,7 @@ package com.horizon.components
 		
 		private function removeDropShadow(sprite:Sprite):void
 		{
-			sprite.filters = null;
+			sprite.filters = [];
 		}
 		
 		private function getRatio(bmc:Sprite):Number
