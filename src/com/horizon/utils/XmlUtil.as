@@ -77,7 +77,8 @@ package com.horizon.utils
 			for (var i:int = 0; i<xmlLength; i++)
 			{
 				var pVO:Object = new ProductsVO();
-				pVO.url = 'http://fashionartstage.sigmagroup.com/'+xml.product[i].@imagesrc;
+				//pVO.url = 'http://fashionartstage.sigmagroup.com/'+xml.product[i].@imagesrc;
+				pVO.url = xml.product[i].@imagesrc;
 				pVO.size = xml.product[i].@size;
 				voarray.push(pVO);
 			}	

@@ -4,12 +4,8 @@ package com.horizon.utils
 	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
-	import flash.display.DisplayObject;
 	import flash.display.Loader;
-	import flash.display.PixelSnapping;
 	import flash.display.Sprite;
-	import flash.events.Event;
-	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.net.FileReference;
@@ -30,16 +26,16 @@ package com.horizon.utils
 			fileRef.save(ba,"capture.jpg");
 		}
 		
-		public static function sendimagetofriend(canvas:Bitmap):void
+		public static function sendimagetofriend(canvas:Bitmap, emailTo:String, subject:String, from:String, emailFrom:String ):void
 		{
 			var encoder:JPGEncoder = new JPGEncoder();
 			var ba:ByteArray = encoder.encode(canvas.bitmapData);
 			
 			var varLoader:URLLoader = new URLLoader;
-			//varLoader.addEventListener(Event.COMPLETE, complete);
 			varLoader.dataFormat = URLLoaderDataFormat.BINARY;
 			
-			var varSend:URLRequest = new URLRequest("emailAttachment.php");
+			var varSend:URLRequest = new URLRequest("emailAttachment.php?emailTo="+emailTo+"&subject="+subject+"&from="+from+"&emailFrom="+emailFrom);
+			//var varSend:URLRequest = new URLRequest("emailAttachment.php");
 			varSend.method = URLRequestMethod.POST;
 			varSend.data = ba;
 			

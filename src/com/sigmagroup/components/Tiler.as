@@ -7,15 +7,12 @@
  */
 package com.sigmagroup.components
 {
-	import com.horizon.events.TilerEvent;
 	import com.horizon.utils.VisualizerUtils;
 	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
-	import flash.display.DisplayObject;
 	import flash.display.Loader;
 	import flash.display.MovieClip;
-	import flash.display.Shape;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;

@@ -6,7 +6,6 @@ package
 	import com.horizon.components.ProductsGallery;
 	import com.horizon.components.SurfacesGallery;
 	import com.horizon.events.ColorSwatchEvent;
-	import com.horizon.events.ProductEvent;
 	import com.horizon.events.TilerEvent;
 	import com.horizon.model.VisualizerModel;
 	import com.horizon.utils.VisualizerUtils;
@@ -49,8 +48,8 @@ package
 		private var animateContentContainer:Boolean;
 		private var currentSurface:int = 0;
 		private var printButton:assets.swfs.ui.printButton;
+		private var sendPopUp:sendToFriendPopUp;
 		private var xmlUtil:XmlUtil = new XmlUtil();
-		//private var cBox:ComboBox = new ComboBox();
 		
 		public function HorizonProductVisualizer()
 		{
@@ -88,7 +87,9 @@ package
 		private function initProductsGallery():void
 		{
 			if(!visualizerModel.productsXml)
-				xmlUtil.loadProductsXml('http://fashionartstage.sigmagroup.com/visualizer.php?view=products');
+				xmlUtil.loadProductsXml('products.xml');
+					
+					//'http://fashionartstage.sigmagroup.com/visualizer.php?view=products');
 			else
 			{
 				createProductsGallery();
@@ -247,6 +248,7 @@ package
 				sendtofriendButton = new sendtofriendbutton();
 				sendtofriendButton.y = 200;
 				sendtofriendButton.x = 500;
+				sendtofriendButton.buttonMode = true;
 				sendtofriendButton.addEventListener(MouseEvent.CLICK, sendimagetofriend);
 			}
 			contentHolder.addChild(sendtofriendButton);
@@ -256,6 +258,7 @@ package
 				printButton = new assets.swfs.ui.printButton;	
 				printButton.x = 500;
 				printButton.y = 250;
+				printButton.buttonMode = true;
 				printButton.addEventListener(MouseEvent.CLICK, printTheCreation);
 			}
 			contentHolder.addChild(printButton);
@@ -276,6 +279,7 @@ package
 		
 		private function stepButtonOverHandler(event:MouseEvent):void{event.currentTarget.gotoAndStop('down')}
 		private function stepButtonOutHandler(event:MouseEvent):void{event.currentTarget.gotoAndStop('up')}
+		
 		//COMPONENT CREATION
 		private function createSurfacesGallery(event:Object=null):void
 		{
@@ -340,9 +344,33 @@ package
 		
 		//PUBLISHING UTILS
 		private function saveImage(e:Object):void{VisualizerUtils.saveimagetodesktop(croppedCanvas)}
-		private function sendimagetofriend(e:Object):void{VisualizerUtils.sendimagetofriend(croppedCanvas)}
+		private function sendimagetofriend(e:Object):void{
+			sendPopUp = new sendToFriendPopUp();
+			sendPopUp.x = 200;
+			sendPopUp.y = 200;
+			sendPopUp.sendButton.addEventListener(MouseEvent.CLICK, sendimage);
+			sendPopUp.sendButton.buttonMode=true;
+			sendPopUp.cancelButton.addEventListener(MouseEvent.CLICK, closePopUp);
+			sendPopUp.cancelButton.buttonMode=true;
+			contentHolder.addChild(sendPopUp);
+		}
 		private function printTheCreation(e:Object):void{VisualizerUtils.printCanvas(croppedCanvas)}
 		
+		//PopUp Listeners
+		private function sendimage(event:MouseEvent):void
+		{
+			closePopUp(null);
+			VisualizerUtils.sendimagetofriend(croppedCanvas, 
+				sendPopUp.emailToInput.text, 
+				sendPopUp.subjectInput.text, 
+				sendPopUp.senderInput.text, 
+				sendPopUp.emailFromInput.text);
+		}
+		
+		private function closePopUp(event:MouseEvent):void
+		{
+			contentHolder.removeChild(sendPopUp);
+		}
 		//DISPLAY
 		private function createProductsFrame():void
 		{

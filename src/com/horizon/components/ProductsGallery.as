@@ -70,8 +70,8 @@ package com.horizon.components
 			
 			bitmapContainer = new Sprite();
 			bitmapContainer.scaleX = bitmapContainer.scaleY = .5;
-			bitmapContainer.addChild(copyBitmap);
 			bitmapContainer.startDrag();
+			bitmapContainer.addChild(copyBitmap);
 			bitmapContainer.scaleX = bitmapContainer.scaleY = ratio;
 			bitmapContainer.x = mouseX - (bitmapContainer.width/2);
 			bitmapContainer.y = mouseY - (bitmapContainer.height/2);
@@ -155,13 +155,14 @@ package com.horizon.components
 		
 		private function applyDropShadow(sprite:Sprite):void
 		{
-			var my_shadow:DropShadowFilter = new DropShadowFilter();  
+			var my_shadow:DropShadowFilter = new DropShadowFilter(); 
 			my_shadow.color = 0x000000;  
-			my_shadow.blurY = 8;  
-			my_shadow.blurX = 8;  
-			my_shadow.angle = 100;  
+			my_shadow.blurY = 2;  
+			my_shadow.blurX = 2;  
+			my_shadow.angle = 150;  
 			my_shadow.alpha = .5;  
-			my_shadow.distance = 6;
+			my_shadow.distance = 3;
+			my_shadow.quality = 3;
 			
 			var filtersArray:Array = new Array(my_shadow);  
 			
