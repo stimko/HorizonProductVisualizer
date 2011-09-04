@@ -26,7 +26,7 @@ package com.horizon.components
 			dispatchEvent(new Event('newSurfaceSelected', true));
 		}
 		
-		override public function animateTiles():void
+		override protected function animateTiles():void
 		{
 			var currentBitmapData:BitmapData;
 			var currentBitmap:Bitmap;

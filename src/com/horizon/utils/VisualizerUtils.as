@@ -5,6 +5,7 @@ package com.horizon.utils
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.Loader;
+	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
@@ -14,7 +15,11 @@ package com.horizon.utils
 	import flash.net.URLRequest;
 	import flash.net.URLRequestMethod;
 	import flash.printing.PrintJob;
+	import flash.printing.PrintJobOptions;
+	import flash.text.TextField;
 	import flash.utils.ByteArray;
+	
+	import gs.TweenLite;
 	
 	public final class VisualizerUtils
 	{
@@ -24,6 +29,13 @@ package com.horizon.utils
 			var encoder:JPGEncoder = new JPGEncoder();
 			var ba:ByteArray = encoder.encode(canvas.bitmapData);
 			fileRef.save(ba,"capture.jpg");
+		}
+		
+		public static function fadeSpriteIn(sprite:Sprite):void
+		{
+			sprite.alpha = 0;
+			sprite.visible = true;
+			TweenLite.to(sprite,.5, {alpha:1});
 		}
 		
 		public static function sendimagetofriend(canvas:Bitmap, emailTo:String, subject:String, from:String, emailFrom:String ):void
@@ -53,11 +65,14 @@ package com.horizon.utils
 			
 			if (printJob.start()) {
 				
+				var marginWidth:Number = (printJob.pageWidth/2) - (canvasSprite.width/2);
+				var marginHeight:Number = (printJob.pageHeight/2) - (canvasSprite.height/2);
+				var rect:Rectangle = new Rectangle(-marginWidth, -marginHeight,  printJob.pageWidth, printJob.pageHeight);
 				if (canvasSprite.width>printJob.pageWidth) {
 					canvasSprite.width=printJob.pageWidth;
 					canvasSprite.scaleY=canvasSprite.scaleX;
 				}
-				printJob.addPage(canvasSprite);
+				printJob.addPage(canvasSprite, rect);
 				printJob.send();
 			}
 		}
@@ -102,6 +117,16 @@ package com.horizon.utils
 			croppedCanvas.y = 65;
 			
 			return croppedCanvas;
+		}
+		
+		public static function generateErrorBitmap(width:int, height:int):BitmapData
+		{
+			var textField:TextField = new TextField();
+			var textBitmapData:BitmapData = new BitmapData(width, height, false, 0xFFFFFF);
+			textField.text = "Image Missing.";
+			textBitmapData.draw(textField);
+			
+			return textBitmapData
 		}
 		
 		public static function removeChildren(sprite:Sprite):void

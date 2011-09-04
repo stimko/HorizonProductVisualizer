@@ -8,6 +8,7 @@
 package com.sigmagroup.components
 {
 	import com.horizon.utils.VisualizerUtils;
+	import com.horizon.utils.VisualizerVanity;
 	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
@@ -15,6 +16,7 @@ package com.sigmagroup.components
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.events.IOErrorEvent;
 	import flash.events.MouseEvent;
 	import flash.filters.GlowFilter;
 	import flash.net.URLRequest;
@@ -225,6 +227,16 @@ package com.sigmagroup.components
 		
 		private function onLoadComplete(event:Event):void
 		{
+			compareImagesLoadedToImagesToLoad();
+		}
+		
+		private function errorHandlerIOErrorEvent(event:IOErrorEvent):void
+		{
+			compareImagesLoadedToImagesToLoad();
+		}
+		
+		private function compareImagesLoadedToImagesToLoad():void
+		{
 			imagesLoaded++;
 			
 			if (imagesLoaded == numberOfImagesToLoadNext)
@@ -239,8 +251,13 @@ package com.sigmagroup.components
 		{				
 			for(var i:int = 0; i<numberOfImagesToLoadNext; i++)
 			{
-				var bitmap:Bitmap = imageLoaders[i].content as Bitmap;
-				currentPageVosReference[i].bmData = bitmap.bitmapData;
+				if(imageLoaders[i] && imageLoaders[i].content)
+				{
+					var bitmap:Bitmap = imageLoaders[i].content as Bitmap;
+					currentPageVosReference[i].bmData = bitmap.bitmapData;
+				}
+				else
+					currentPageVosReference[i].bmData = VisualizerUtils.generateErrorBitmap(imageWidth, imageHeight);	
 			}
 		}
 		
@@ -269,11 +286,20 @@ package com.sigmagroup.components
 			
 			for each(var vo:Object in currentPageVosReference)
 			{
-				var imageLoader:Loader = new Loader();
-				var image:URLRequest = new URLRequest (vo.url);
-				imageLoader.load(image);
-				imageLoaders.push(imageLoader);
-				imageLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadComplete);
+				if(vo.url)
+				{
+					var imageLoader:Loader = new Loader();
+					var image:URLRequest = new URLRequest(VisualizerVanity.FashionArtsURL+vo.url);
+					imageLoader.load(image);
+					imageLoaders.push(imageLoader);
+					imageLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadComplete);
+					imageLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, errorHandlerIOErrorEvent);
+				}
+				else
+				{
+					imagesLoaded++;
+					imageLoaders.push(null);	
+				}
 			}
 		}
 		
@@ -294,7 +320,7 @@ package com.sigmagroup.components
 			}
 		}
 		
-		//POSSIBLY OVERIDDEN METHODS
+		//POTENTIALLY OVERIDDEN METHODS
 		protected function imageOverHandler(event:MouseEvent):void
 		{
 			var filt:GlowFilter = new GlowFilter(0xff99cc, .5, 20, 20, 3, 2);  
@@ -313,7 +339,7 @@ package com.sigmagroup.components
 		protected function imageDownHandler(event:MouseEvent):void{assignCurrentSelected(event.currentTarget as Sprite)};
 		
 		
-		public function animateTiles():void
+		protected function animateTiles():void
 		{
 			var currentBitmapData:BitmapData;
 			var currentBitmap:Bitmap;

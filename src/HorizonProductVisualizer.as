@@ -23,8 +23,6 @@ package
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	
-	import gs.TweenLite;
-	
 	[SWF(width='902', height='515', backgroundColor='#ffffff', frameRate='25')]
 	
 	public class HorizonProductVisualizer extends Sprite
@@ -82,14 +80,15 @@ package
 			xmlUtil.addEventListener('productsXMLLoaded', createDesignView);
 		}
 		
-		private function initSurfacesGallery():void{xmlUtil.loadSurfacesXml('surfaces.xml')}
+		private function initSurfacesGallery():void{
+			//xmlUtil.loadSurfacesXml('surfaces.xml');
+			xmlUtil.loadSurfacesXml(VisualizerVanity.FashionArtsURL+'visualizer.php?view=surfaces')
+		}
 		
 		private function initProductsGallery():void
 		{
 			if(!visualizerModel.productsXml)
-				xmlUtil.loadProductsXml('products.xml');
-					
-					//'http://fashionartstage.sigmagroup.com/visualizer.php?view=products');
+				xmlUtil.loadProductsXml(VisualizerVanity.FashionArtsURL+'visualizer.php?view=products');
 			else
 			{
 				createProductsGallery();
@@ -107,12 +106,16 @@ package
 			if(previousState == VisualizerVanity.PUBLISH)
 			{
 				removeChild(croppedCanvas);
+				if(!sendtofriendButton.hasEventListener(MouseEvent.CLICK))
+				sendtofriendButton.addEventListener(MouseEvent.CLICK, displayEmailPopUp);
 				animateContentContainer = false;
 			}
 			else
 				animateContentContainer = true;
 			
-			currentState == VisualizerVanity.PUBLISH ? nextButton.visible = false : nextButton.visible = true;
+			currentState == VisualizerVanity.PUBLISH ? nextButton.visible = false : 
+				(nextButton.visible ? nextButton.visible  = true 
+					: VisualizerUtils.fadeSpriteIn(nextButton));
 			
 			switch(name){
 				case VisualizerVanity.SURFACES:
@@ -124,7 +127,7 @@ package
 				case VisualizerVanity.PUBLISH:
 					displayCroppedCanvas();
 					createPublishButtons();
-					animateContentHolder();
+					VisualizerUtils.fadeSpriteIn(contentHolder);
 					break; 
 			}
 		}
@@ -134,7 +137,6 @@ package
 			contentHolder.addChild(productsFrame);
 			contentHolder.addChild(productsGallery);
 			productsGallery.reAnimate(animateContentContainer);
-			//contentHolder.addChild(cBox);
 		}
 		
 		private function displayCroppedCanvas():void
@@ -142,13 +144,7 @@ package
 			croppedCanvas = VisualizerUtils.captureCreationArea(colorSwatches, productsGallery);
 			addChild(croppedCanvas);
 		}
-		
-		private function animateContentHolder():void
-		{
-			contentHolder.alpha = 0;
-			TweenLite.to(contentHolder,.5, {alpha:1});
-		}
-		
+	
 		private function createDesignView(event:Object):void
 		{
 			createProductsFrame();
@@ -249,7 +245,7 @@ package
 				sendtofriendButton.y = 200;
 				sendtofriendButton.x = 500;
 				sendtofriendButton.buttonMode = true;
-				sendtofriendButton.addEventListener(MouseEvent.CLICK, sendimagetofriend);
+				sendtofriendButton.addEventListener(MouseEvent.CLICK, displayEmailPopUp);
 			}
 			contentHolder.addChild(sendtofriendButton);
 			
@@ -344,21 +340,32 @@ package
 		
 		//PUBLISHING UTILS
 		private function saveImage(e:Object):void{VisualizerUtils.saveimagetodesktop(croppedCanvas)}
-		private function sendimagetofriend(e:Object):void{
+		private function displayEmailPopUp(e:Object):void{
+			if(!sendPopUp)
+			{
 			sendPopUp = new sendToFriendPopUp();
-			sendPopUp.x = 200;
-			sendPopUp.y = 200;
-			sendPopUp.sendButton.addEventListener(MouseEvent.CLICK, sendimage);
+			sendPopUp.x = 502;
+			sendPopUp.y = 300;
 			sendPopUp.sendButton.buttonMode=true;
 			sendPopUp.cancelButton.addEventListener(MouseEvent.CLICK, closePopUp);
 			sendPopUp.cancelButton.buttonMode=true;
+			}
+			sendtofriendButton.removeEventListener(MouseEvent.CLICK, displayEmailPopUp);
+			
+			VisualizerUtils.fadeSpriteIn(sendPopUp);
+			
+			if(!sendPopUp.sendButton.hasEventListener(MouseEvent.CLICK))
+			sendPopUp.sendButton.addEventListener(MouseEvent.CLICK, sendimage);
+			
+			setChildIndex(contentHolder, numChildren-1);
 			contentHolder.addChild(sendPopUp);
 		}
 		private function printTheCreation(e:Object):void{VisualizerUtils.printCanvas(croppedCanvas)}
 		
-		//PopUp Listeners
+		//Send Pop Up Listeners
 		private function sendimage(event:MouseEvent):void
 		{
+			sendPopUp.sendButton.removeEventListener(MouseEvent.CLICK, sendimage);
 			closePopUp(null);
 			VisualizerUtils.sendimagetofriend(croppedCanvas, 
 				sendPopUp.emailToInput.text, 
@@ -370,12 +377,13 @@ package
 		private function closePopUp(event:MouseEvent):void
 		{
 			contentHolder.removeChild(sendPopUp);
+			sendtofriendButton.addEventListener(MouseEvent.CLICK, displayEmailPopUp);
 		}
 		//DISPLAY
 		private function createProductsFrame():void
 		{
 			productsFrame = VisualizerUtils.loadFrameImage();
-			productsFrame.x = 475;
+			productsFrame.x = 480;
 			productsFrame.y = 73;
 		}
 		//EVENT TRANSFER

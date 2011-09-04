@@ -49,6 +49,7 @@ package com.horizon.components
 			clearButton.y = 460;
 			addChild(clearButton);
 			clearButton.addEventListener(MouseEvent.CLICK, clearTheSurface);
+			VisualizerUtils.fadeSpriteIn(clearButton);
 		}
 		
 		private function clearTheSurface(event:MouseEvent):void
@@ -148,6 +149,7 @@ package com.horizon.components
 			supportContentContainer.cacheAsBitmap = true;
 			maskSprite = event.maskSprite;
 			maskSprite.y = maskSpriteHeight;
+			//maskSprite.x = maskSprite.getChildAt(0).x;
 			
 			addChild(maskSprite);
 			supportContentContainer.mask = maskSprite;

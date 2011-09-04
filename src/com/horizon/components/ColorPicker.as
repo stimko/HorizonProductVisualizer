@@ -3,6 +3,7 @@ package com.horizon.components
 	import com.horizon.events.ColorSwatchEvent;
 	import com.horizon.events.TilerEvent;
 	import com.horizon.utils.VisualizerUtils;
+	import com.horizon.utils.VisualizerVanity;
 	import com.sigmagroup.components.Tiler;
 	
 	import flash.display.Bitmap;
@@ -10,6 +11,7 @@ package com.horizon.components
 	import flash.display.Loader;
 	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.events.IOErrorEvent;
 	import flash.events.MouseEvent;
 	import flash.net.URLRequest;
 	
@@ -23,6 +25,8 @@ package com.horizon.components
 		private var colorBitmap:Bitmap;
 		private var previousBitmap:Bitmap;
 		private const surfaceY:int = 70;
+		private var surfaceWidth:int = 0;
+		private var surfaceHeight:int = 0;
 		
 		public function ColorPicker(vos:Vector.<Object>, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int=1, totalImages:int=0, displayNames:Boolean=false, scale:Number = 1, startingX:int = 0, startingY:int = 0)
 		{
@@ -67,14 +71,33 @@ package com.horizon.components
 		private function loadColorImage():void
 		{
 			var imageLoader:Loader = new Loader();
-			var image:URLRequest = new URLRequest (currentVO.url);
+			var image:URLRequest = new URLRequest (VisualizerVanity.FashionArtsURL+currentVO.url);
 			imageLoader.load(image);
 			imageLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadComplete);
+			imageLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, errorLoadingSurface);
 		}
 		
 		private function onLoadComplete(event:Event):void
 		{
 			currentVO.bmData = Bitmap(event.currentTarget.content).bitmapData;
+			
+			if(surfaceHeight==0)
+			{
+				surfaceWidth = currentVO.bmData.width;
+				surfaceHeight = currentVO.bmData.height;
+			}
+			
+			displaySurface();
+		}
+		
+		private function errorLoadingSurface(event:IOErrorEvent):void
+		{
+			currentVO.bmData = VisualizerUtils.generateErrorBitmap(surfaceWidth==0?surfaceWidth:300, surfaceHeight==0?surfaceHeight:300);
+			displaySurface();
+		}
+		
+		private function displaySurface():void
+		{
 			VisualizerUtils.removeChildren(supportContentContainer);
 			displayColorImage();
 		}
@@ -85,11 +108,13 @@ package com.horizon.components
 			{
 				previousBitmap = new Bitmap(previousVO.bmData);
 				previousContainer.addChild(previousBitmap);
+				previousBitmap.x = 240 - (surfaceWidth/2);
 			}
 			
 			supportContentContainer.alpha = 0;
 			colorBitmap = new Bitmap(currentVO.bmData);
 			colorBitmap.smoothing = true;
+			colorBitmap.x = 240 - (surfaceWidth/2);
 			supportContentContainer.addChild(colorBitmap);
 			colorBitmap.y = surfaceY;
 			TweenLite.to(supportContentContainer,.5, {alpha:1, onComplete:removePreviousContainer});
@@ -104,8 +129,8 @@ package com.horizon.components
 			//bmMask = MaskUtil.convertPngToMask(currentVO.bmData);
 			//bm.scaleX = .75;
 			//bm.scaleY = .75;
-			var maskBitmap:Bitmap = new Bitmap(currentVO.bmData);
-			bmMaskSprite.addChild(maskBitmap);
+			//var maskBitmap:Bitmap = new Bitmap(currentVO.bmData);
+			bmMaskSprite.addChild(colorBitmap);
 			bmMaskSprite.cacheAsBitmap = true;
 			
 			dispatchEvent(new ColorSwatchEvent(bmMaskSprite, ColorSwatchEvent.MASK_READY, true));
@@ -131,7 +156,7 @@ package com.horizon.components
 			VisualizerUtils.removeChildren(previousContainer);
 		}
 		
-		override public function animateTiles():void
+		override protected function animateTiles():void
 		{
 			var currentSwatch:Sprite;
 			var currentHexString:String;
@@ -148,6 +173,7 @@ package com.horizon.components
 				currentHex = uint(currentHexString);
 				
 				currentSwatch.graphics.beginFill(currentHex);
+				currentSwatch.graphics.lineStyle(1,0xCCCCCC);
 				currentSwatch.graphics.drawRect(0, 0, imageWidth, imageHeight);
 				currentSwatch.graphics.endFill();
 				
@@ -176,6 +202,8 @@ package com.horizon.components
 			currentIndex=0;
 			previousVO = null;
 			currentSelected = 0;
+			surfaceHeight = 0;
+			surfaceWidth = 0;
 			init();
 			checkIfBitmapDataAvailable();
 		}
