@@ -148,8 +148,6 @@ package com.horizon.components
 			
 			supportContentContainer.cacheAsBitmap = true;
 			maskSprite = event.maskSprite;
-			maskSprite.y = maskSpriteHeight;
-			//maskSprite.x = maskSprite.getChildAt(0).x;
 			
 			addChild(maskSprite);
 			supportContentContainer.mask = maskSprite;

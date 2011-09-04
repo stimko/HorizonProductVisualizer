@@ -64,6 +64,8 @@ package com.horizon.components
 			else
 			{
 				VisualizerUtils.removeChildren(supportContentContainer);
+				surfaceHeight = currentVO.bmData.height;
+				surfaceWidth = currentVO.bmData.width;
 				displayColorImage();
 			}
 		}
@@ -129,12 +131,13 @@ package com.horizon.components
 			//bmMask = MaskUtil.convertPngToMask(currentVO.bmData);
 			//bm.scaleX = .75;
 			//bm.scaleY = .75;
-			//var maskBitmap:Bitmap = new Bitmap(currentVO.bmData);
-			bmMaskSprite.addChild(colorBitmap);
+			var maskBitmap:Bitmap = new Bitmap(currentVO.bmData);
+			maskBitmap.x = colorBitmap.x;
+			maskBitmap.y = colorBitmap.y;
+			bmMaskSprite.addChild(maskBitmap);
 			bmMaskSprite.cacheAsBitmap = true;
 			
 			dispatchEvent(new ColorSwatchEvent(bmMaskSprite, ColorSwatchEvent.MASK_READY, true));
-			//addChild(bm);
 		}
 		override public function reAnimate(animateContentContainer:Boolean=true):void
 		{
