@@ -14,10 +14,10 @@ package com.horizon.components
 	{
 		public var currentSurface:int;
 		
-		public function SurfacesGallery(vos:Vector.<Object>, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int=1, totalImages:int=0, displayNames:Boolean=false, scale:Number=1, startingX:int = 0, startingY:int = 0)
+		public function SurfacesGallery(vos:Vector.<Object>, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int=1, totalImages:int=0, displayNames:Boolean=false, scale:Number=1, startingX:int = 0, startingY:int = 0, usePreLoader:Boolean = false)
 		{
 			initiateDisplayFunction = loadPage;
-			super(vos, paginate, bitmap, imageWidth, imageHeight, horPadding, vertPadding, specifiedNumOfColumns, specifiedNumOfRows, totalImages, displayNames, scale, startingX, startingY);
+			super(vos, paginate, bitmap, imageWidth, imageHeight, horPadding, vertPadding, specifiedNumOfColumns, specifiedNumOfRows, totalImages, displayNames, scale, startingX, startingY, usePreLoader);
 		}
 		
 		override protected function imageDownHandler(event:MouseEvent):void
@@ -56,6 +56,9 @@ package com.horizon.components
 				currentImagesContainer.addChild(currentImageHolder);
 				TweenLite.to(currentImageHolder,1, {alpha:1, delay:(.075*a)});
 			}
+			
+			if(preLoader)
+				removePreLoader();
 		}
 	}
 }

@@ -46,9 +46,11 @@ package com.horizon.components
 		{
 			var clearButton:clearSurfaceButton = new clearSurfaceButton();
 			clearButton.x = 350;
-			clearButton.y = 460;
+			clearButton.y = 470;
 			addChild(clearButton);
 			clearButton.addEventListener(MouseEvent.CLICK, clearTheSurface);
+			clearButton.addEventListener(MouseEvent.MOUSE_OVER, mouseOver);
+			clearButton.addEventListener(MouseEvent.MOUSE_OUT, mouseOut);
 			VisualizerUtils.fadeSpriteIn(clearButton);
 		}
 		
@@ -187,13 +189,13 @@ package com.horizon.components
 			switch(size)
 			{
 				case 'small':
-					ratio = .5;
+					ratio = .25;
 					break;
 				case 'medium':
-					ratio = .75;
+					ratio = .5;
 					break;
 				case 'large':
-					ratio =  1;
+					ratio =  .75;
 					break;
 			}
 			return ratio;

@@ -23,7 +23,7 @@ package
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	
-	[SWF(width='902', height='515', backgroundColor='#ffffff', frameRate='25')]
+	[SWF(width='900', height='515', backgroundColor='#ffffff', frameRate='25')]
 	
 	public class HorizonProductVisualizer extends Sprite
 	{
@@ -47,7 +47,9 @@ package
 		private var currentSurface:int = 0;
 		private var printButton:assets.swfs.ui.printButton;
 		private var sendPopUp:sendToFriendPopUp;
+		private var emailMessageSprite:InvalidEmail;
 		private var xmlUtil:XmlUtil = new XmlUtil();
+		private var preLoader:LoadingText;
 		
 		public function HorizonProductVisualizer()
 		{
@@ -80,10 +82,7 @@ package
 			xmlUtil.addEventListener('productsXMLLoaded', createDesignView);
 		}
 		
-		private function initSurfacesGallery():void{
-			//xmlUtil.loadSurfacesXml('surfaces.xml');
-			xmlUtil.loadSurfacesXml(VisualizerVanity.FashionArtsURL+'visualizer.php?view=surfaces')
-		}
+		private function initSurfacesGallery():void{xmlUtil.loadSurfacesXml(VisualizerVanity.FashionArtsURL+'visualizer.php?view=surfaces')}
 		
 		private function initProductsGallery():void
 		{
@@ -107,8 +106,9 @@ package
 			{
 				removeChild(croppedCanvas);
 				if(!sendtofriendButton.hasEventListener(MouseEvent.CLICK))
-				sendtofriendButton.addEventListener(MouseEvent.CLICK, displayEmailPopUp);
+					sendtofriendButton.addEventListener(MouseEvent.CLICK, displayEmailPopUp);
 				animateContentContainer = false;
+				emailMessageSprite.emailMessage.text = "";
 			}
 			else
 				animateContentContainer = true;
@@ -127,6 +127,7 @@ package
 				case VisualizerVanity.PUBLISH:
 					displayCroppedCanvas();
 					createPublishButtons();
+					createEmailMessage();
 					VisualizerUtils.fadeSpriteIn(contentHolder);
 					break; 
 			}
@@ -144,7 +145,7 @@ package
 			croppedCanvas = VisualizerUtils.captureCreationArea(colorSwatches, productsGallery);
 			addChild(croppedCanvas);
 		}
-	
+		
 		private function createDesignView(event:Object):void
 		{
 			createProductsFrame();
@@ -173,11 +174,12 @@ package
 		private function createNextButton():void
 		{
 			this.nextButton = new assets.swfs.ui.nextButton();
-			nextButton.x = 775;
-			nextButton.y  = 450;
+			nextButton.x = 789;
+			nextButton.y  = 446;
 			nextButton.buttonMode = true;
 			addChild(nextButton);
 			nextButton.addEventListener(MouseEvent.MOUSE_DOWN, nextDown);
+			addGenericListenersToButton(nextButton);
 		}
 		
 		private function nextDown(event:Object):void
@@ -232,20 +234,23 @@ package
 		{
 			if(!savetodesktopButton){
 				savetodesktopButton = new savetodesktopbutton();
-				savetodesktopButton.y = 150;
+				savetodesktopButton.y = 100;
 				savetodesktopButton.x = 500;
 				savetodesktopButton.buttonMode = true;
 				savetodesktopButton.addEventListener(MouseEvent.CLICK, saveImage);
+				addGenericListenersToButton(savetodesktopButton);
+				
 			}
 			contentHolder.addChild(savetodesktopButton);
 			
 			if(!sendtofriendButton)
 			{
 				sendtofriendButton = new sendtofriendbutton();
-				sendtofriendButton.y = 200;
+				sendtofriendButton.y = 150;
 				sendtofriendButton.x = 500;
 				sendtofriendButton.buttonMode = true;
 				sendtofriendButton.addEventListener(MouseEvent.CLICK, displayEmailPopUp);
+				addGenericListenersToButton(sendtofriendButton);
 			}
 			contentHolder.addChild(sendtofriendButton);
 			
@@ -253,11 +258,19 @@ package
 			{
 				printButton = new assets.swfs.ui.printButton;	
 				printButton.x = 500;
-				printButton.y = 250;
+				printButton.y = 200;
 				printButton.buttonMode = true;
 				printButton.addEventListener(MouseEvent.CLICK, printTheCreation);
+				addGenericListenersToButton(printButton);
 			}
 			contentHolder.addChild(printButton);
+		}
+		
+		private function createEmailMessage():void
+		{
+			emailMessageSprite = new InvalidEmail();
+			contentHolder.addChild(emailMessageSprite);
+			emailMessageSprite.x = 500;
 		}
 		
 		private function enablePublishButton():void
@@ -281,7 +294,7 @@ package
 		{
 			if(!surfacesGallery)
 			{
-				surfacesGallery = new SurfacesGallery(visualizerModel.surfacesVOsReference, false, true, 150, 170, 10, 10, 5, 1, 5, true, 1, 50, 160);
+				surfacesGallery = new SurfacesGallery(visualizerModel.surfacesVOsReference, false, true, 150, 170, 10, 10, 5, 1, 5, true, 1, 50, 160, true);
 				contentHolder.addChild(surfacesGallery);
 				surfacesGallery.buttonMode = true;
 			}
@@ -296,13 +309,15 @@ package
 		{
 			if(!productsGallery)
 			{
-				productsGallery = new ProductsGallery(visualizerModel.productsVOsReference,true, true, 96, 96, 18, 18, 5, 5, 0, false, .5, 510, 110);
+				productsGallery = new ProductsGallery(visualizerModel.productsVOsReference, true, true, 96, 96, 18, 18, 5, 5, 0, false, .5, 515, 110);
 				contentHolder.addChild(productsFrame);
 				contentHolder.addChild(productsGallery);
 				productsGallery.buttonMode = true;
 			}
 			else
 				displayTheProductsGallery();
+			
+			VisualizerUtils.fadeSpriteIn(productsFrame);
 		}
 		
 		private function createColorSwatches():void
@@ -332,7 +347,7 @@ package
 		
 		private function instantiateColorSwatchComponent(currentSurfaceVOs:Vector.<Object>):void
 		{
-			colorSwatches = new ColorPicker(currentSurfaceVOs, false, false, 25, 25, 5, 5, 0, 1, 8, false, 1, 20, 456);
+			colorSwatches = new ColorPicker(currentSurfaceVOs, false, false, 25, 25, 5, 5, 0, 1, 8, false, 1, 12, 456);
 			contentHolder.addChild(colorSwatches);
 		}
 		
@@ -343,19 +358,22 @@ package
 		private function displayEmailPopUp(e:Object):void{
 			if(!sendPopUp)
 			{
-			sendPopUp = new sendToFriendPopUp();
-			sendPopUp.x = 502;
-			sendPopUp.y = 300;
-			sendPopUp.sendButton.buttonMode=true;
-			sendPopUp.cancelButton.addEventListener(MouseEvent.CLICK, closePopUp);
-			sendPopUp.cancelButton.buttonMode=true;
+				sendPopUp = new sendToFriendPopUp();
+				sendPopUp.x = 502;
+				sendPopUp.y = printButton.y + printButton.height + 15;
+				sendPopUp.sendButton.buttonMode=true;
+				sendPopUp.cancelButton.addEventListener(MouseEvent.CLICK, closePopUp);
+				sendPopUp.cancelButton.buttonMode=true;
+				addGenericListenersToButton(sendPopUp.cancelButton);
+				addGenericListenersToButton(sendPopUp.sendButton);
 			}
-			sendtofriendButton.removeEventListener(MouseEvent.CLICK, displayEmailPopUp);
 			
+			emailMessageSprite.emailMessage.text = "";
+			sendtofriendButton.removeEventListener(MouseEvent.CLICK, displayEmailPopUp);
 			VisualizerUtils.fadeSpriteIn(sendPopUp);
 			
 			if(!sendPopUp.sendButton.hasEventListener(MouseEvent.CLICK))
-			sendPopUp.sendButton.addEventListener(MouseEvent.CLICK, sendimage);
+				sendPopUp.sendButton.addEventListener(MouseEvent.CLICK, sendimage);
 			
 			setChildIndex(contentHolder, numChildren-1);
 			contentHolder.addChild(sendPopUp);
@@ -365,19 +383,33 @@ package
 		//Send Pop Up Listeners
 		private function sendimage(event:MouseEvent):void
 		{
-			sendPopUp.sendButton.removeEventListener(MouseEvent.CLICK, sendimage);
-			closePopUp(null);
-			VisualizerUtils.sendimagetofriend(croppedCanvas, 
-				sendPopUp.emailToInput.text, 
-				sendPopUp.subjectInput.text, 
-				sendPopUp.senderInput.text, 
-				sendPopUp.emailFromInput.text);
+			var emailText:String = sendPopUp.emailToInput.text;
+			var nameText:String = sendPopUp.nameInput.text;
+			var fromEmail:String = sendPopUp.emailFromInput.text;
+			
+			if(VisualizerUtils.validateEmail(emailText, nameText, fromEmail))
+			{
+				closePopUp(null);
+				emailMessageSprite.y = printButton.y + printButton.height + 15;
+				sendPopUp.sendButton.removeEventListener(MouseEvent.CLICK, sendimage);
+				emailMessageSprite.emailMessage.text = VisualizerVanity.EMAIL_SUCCESS_MESSAGE;
+				VisualizerUtils.sendimagetofriend(croppedCanvas, 
+					sendPopUp.emailToInput.text, 
+					sendPopUp.nameInput.text, 
+					sendPopUp.emailFromInput.text);
+			} else
+			{
+				emailMessageSprite.y = sendPopUp.y + sendPopUp.height + 5;
+				emailMessageSprite.emailMessage.text = VisualizerVanity.EMAIL_ERROR_MESSAGE;
+				VisualizerUtils.fadeSpriteIn(emailMessageSprite);
+			}
 		}
 		
 		private function closePopUp(event:MouseEvent):void
 		{
 			contentHolder.removeChild(sendPopUp);
 			sendtofriendButton.addEventListener(MouseEvent.CLICK, displayEmailPopUp);
+			emailMessageSprite.emailMessage.text = "";
 		}
 		//DISPLAY
 		private function createProductsFrame():void
@@ -386,11 +418,27 @@ package
 			productsFrame.x = 480;
 			productsFrame.y = 73;
 		}
+		
 		//EVENT TRANSFER
 		private function onMaskReady(event:ColorSwatchEvent):void
 		{
 			var csEvent:ColorSwatchEvent = new ColorSwatchEvent(event.maskSprite, event.type);
 			productsGallery.dispatchEvent(csEvent);
+		}
+		//GENERIC MOUSE LISTENERS
+		private function addGenericListenersToButton(mc:MovieClip):void
+		{
+			mc.addEventListener(MouseEvent.MOUSE_OVER, mouseOver);
+			mc.addEventListener(MouseEvent.MOUSE_OUT, mouseOut);
+		}
+		private function mouseOver(event:MouseEvent):void
+		{
+			event.currentTarget.gotoAndStop('over');
+		}
+		
+		private function mouseOut(event:MouseEvent):void
+		{
+			event.currentTarget.gotoAndStop('out');
 		}
 	}
 }

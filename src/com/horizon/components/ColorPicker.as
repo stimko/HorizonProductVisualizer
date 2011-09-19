@@ -1,5 +1,7 @@
 package com.horizon.components
 {
+	import assets.swfs.ui.LoadingText;
+	
 	import com.horizon.events.ColorSwatchEvent;
 	import com.horizon.events.TilerEvent;
 	import com.horizon.utils.VisualizerUtils;
@@ -7,7 +9,6 @@ package com.horizon.components
 	import com.sigmagroup.components.Tiler;
 	
 	import flash.display.Bitmap;
-	import flash.display.BitmapData;
 	import flash.display.Loader;
 	import flash.display.Sprite;
 	import flash.events.Event;
@@ -27,6 +28,7 @@ package com.horizon.components
 		private const surfaceY:int = 70;
 		private var surfaceWidth:int = 0;
 		private var surfaceHeight:int = 0;
+		private var surfacePreLoader:LoadingText;
 		
 		public function ColorPicker(vos:Vector.<Object>, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int=1, totalImages:int=0, displayNames:Boolean=false, scale:Number = 1, startingX:int = 0, startingY:int = 0)
 		{
@@ -77,10 +79,12 @@ package com.horizon.components
 			imageLoader.load(image);
 			imageLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadComplete);
 			imageLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, errorLoadingSurface);
+		 	addPreLoader();
 		}
 		
 		private function onLoadComplete(event:Event):void
 		{
+			removeSurfacePreLoader();
 			currentVO.bmData = Bitmap(event.currentTarget.content).bitmapData;
 			
 			if(surfaceHeight==0)
@@ -139,6 +143,20 @@ package com.horizon.components
 			
 			dispatchEvent(new ColorSwatchEvent(bmMaskSprite, ColorSwatchEvent.MASK_READY, true));
 		}
+		private function removeSurfacePreLoader():void
+		{
+			removeChild(surfacePreLoader);
+			surfacePreLoader = null;
+		}
+		
+		private function addPreLoader():void
+		{
+			surfacePreLoader = new LoadingText();
+			surfacePreLoader.x = 224;
+			surfacePreLoader.y = 245;
+			addChild(surfacePreLoader);
+		}
+		
 		override public function reAnimate(animateContentContainer:Boolean=true):void
 		{
 			VisualizerUtils.removeChildren(currentImagesContainer);
@@ -157,6 +175,18 @@ package com.horizon.components
 		{
 			isAnimating = false;
 			VisualizerUtils.removeChildren(previousContainer);
+		}
+		
+		override protected function imageOverHandler(event:MouseEvent):void
+		{
+			var currentSprite:Sprite = event.currentTarget as Sprite;
+			currentSprite.scaleX = currentSprite.scaleY = 1.1;
+		}
+		
+		override protected function imageOutHandler(event:MouseEvent):void
+		{
+			var currentSprite:Sprite = event.currentTarget as Sprite;
+			currentSprite.scaleX = currentSprite.scaleY = 1;
 		}
 		
 		override protected function animateTiles():void
@@ -184,8 +214,8 @@ package com.horizon.components
 				currentSwatchHolder.alpha = 0;
 				currentSwatchHolder.x = (a*totalWidth) + currentImagesContainer.x;
 				currentSwatchHolder.buttonMode = true;
-				//currentImageHolder.addEventListener(MouseEvent.MOUSE_OVER, imageOverHandler);
-				//currentImageHolder.addEventListener(MouseEvent.MOUSE_OUT, imageOutHandler);
+				currentSwatchHolder.addEventListener(MouseEvent.MOUSE_OVER, imageOverHandler);
+				currentSwatchHolder.addEventListener(MouseEvent.MOUSE_OUT, imageOutHandler);
 				currentSwatchHolder.addEventListener(MouseEvent.MOUSE_DOWN, imageDownHandler);
 				currentImagesContainer.addChild(currentSwatchHolder);
 				TweenLite.to(currentSwatchHolder,1, {alpha:1, delay:(.075*a)});

@@ -12,8 +12,8 @@ package com.horizon.events
 		
 		public function TilerEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false, vos:Vector.<Object>=null)
 		{
-			this.vos = vos;
 			super(type, bubbles, cancelable);
+			this.vos = vos;
 		}
 		
 		override public function clone():Event {

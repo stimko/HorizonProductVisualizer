@@ -7,6 +7,8 @@
  */
 package com.sigmagroup.components
 {
+	import assets.swfs.ui.LoadingText;
+	
 	import com.horizon.utils.VisualizerUtils;
 	import com.horizon.utils.VisualizerVanity;
 	
@@ -42,6 +44,7 @@ package com.sigmagroup.components
 		private var imageLoaders:Vector.<Loader>;
 		private var pageVosReference:Array = new Array();
 		private var maxAmountOfImages:int;
+		private var usePreLoader:Boolean;
 		
 		public var currentSelected:int;
 		public var supportContentContainer:Sprite;
@@ -63,8 +66,9 @@ package com.sigmagroup.components
 		protected var currentPageVosReference:Vector.<Object> = new Vector.<Object>();
 		protected var initiateDisplayFunction:Function;
 		protected var currentImagesContainer:Sprite;
+		protected var preLoader:LoadingText;
 		
-		public function Tiler( vos:Vector.<Object>, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int = 1, maxAmountofImages:int = 0, displayNames:Boolean = false, scale:Number = 1, startingX:int = 0, startingY:int= 0)
+		public function Tiler( vos:Vector.<Object>, paginate:Boolean, bitmap:Boolean, imageWidth:int, imageHeight:int, horPadding:int, vertPadding:int, specifiedNumOfColumns:int, specifiedNumOfRows:int = 1, maxAmountofImages:int = 0, displayNames:Boolean = false, scale:Number = 1, startingX:int = 0, startingY:int= 0, usePreLoader:Boolean = false)
 		{
 			this.specifiedNumOfRows = specifiedNumOfRows;
 			this.specifiedNumOfColumns = specifiedNumOfColumns;
@@ -83,6 +87,7 @@ package com.sigmagroup.components
 			this.totalHeight = imageHeight + vertPadding;
 			this.currentIndex = 0;
 			this.totalImages = this.maxAmountOfImages = maxAmountofImages;
+			this.usePreLoader = usePreLoader;
 			
 			createCurrentImagesContainer(startingX, startingY);
 			
@@ -187,30 +192,53 @@ package com.sigmagroup.components
 		private function createPageNumber(pageNumber:int):void
 		{
 			var tfmc:MovieClip = new MovieClip();
+			tfmc.x = 800 - (15*(totalPages - pageNumber));
+			tfmc.y = currentImagesContainer.y - 40;
+			tfmc.buttonMode = true;
+			tfmc.addEventListener(MouseEvent.MOUSE_OVER, pageNumOver);
+			tfmc.addEventListener(MouseEvent.MOUSE_OUT, pageNumOut);
+			tfmc.addEventListener(MouseEvent.MOUSE_DOWN, navigateToPage);
+			
 			var tf:TextField = new TextField();
 			tf.text = pageNumber.toString();
 			tf.selectable = false;
+			tf.mouseEnabled = false;
 			tf.autoSize = TextFieldAutoSize.LEFT; 
-			tf.addEventListener(MouseEvent.MOUSE_DOWN, navigateToPage);
 			
 			var myFormat:TextFormat = new TextFormat();  
-			myFormat.color = 0xAA0000; 
-			myFormat.size = 16;  
+			myFormat.color = 0x000000; 
+			myFormat.size = 12;
+			myFormat.font = "ItcAG";
 			myFormat.italic = true;  
 			tf.setTextFormat(myFormat);
 			
-			tfmc.x = (20*(pageNumber-1)) + currentImagesContainer.x;
-			tfmc.y = currentImagesContainer.y - 40;
 			tfmc.addChild(tf);
-			tfmc.width = tf.width;
-			tfmc.height = tf.height;
-			tfmc.buttonMode = true
 			addChild(tfmc);
+		}
+		
+		private function pageNumOver(event:MouseEvent):void
+		{
+			var currentNumberSprite:Sprite = event.currentTarget as Sprite;
+			var currentNumberText:TextField = currentNumberSprite.getChildAt(0) as TextField;
+			currentNumberText.textColor = 0xf273bc;
+			var lineSprite:Sprite = new Sprite();
+			lineSprite.graphics.lineStyle(1, 0xf273bc);
+			lineSprite.graphics.lineTo(10, 0);
+			lineSprite.y = 15;
+			currentNumberSprite.addChild(lineSprite);
+		}
+		
+		private function pageNumOut(event:MouseEvent):void
+		{
+			var currentNumberSprite:Sprite = event.currentTarget as Sprite;
+			var currentNumberText:TextField = currentNumberSprite.getChildAt(0) as TextField;
+			currentNumberSprite.removeChildAt(1);
+			currentNumberText.textColor = 0x00000;
 		}
 		
 		private function navigateToPage(event:MouseEvent):void
 		{
-			var pageNumber:int = int(event.currentTarget.text); 
+			var pageNumber:int = int(event.currentTarget.getChildAt(0).text); 
 			if(pageNumber != currentPage)
 			{
 				currentPage = pageNumber;
@@ -271,7 +299,7 @@ package com.sigmagroup.components
 			var myFormat:TextFormat = new TextFormat("Comic Sans MS"); 
 			myFormat.color = 0x000000; 
 			myFormat.size = 24;  
-			myFormat.italic = true;  
+			myFormat.font = "ItcAG";
 			tf.setTextFormat(myFormat);	
 			
 			tf.x = ((imageWidth/2) - (tf.width/2));
@@ -283,6 +311,9 @@ package com.sigmagroup.components
 		{	
 			imageLoaders = new Vector.<Loader>;
 			numberOfImagesToLoadNext = currentPageVosReference.length;
+			
+			if(usePreLoader)
+				addPreLoader();
 			
 			for each(var vo:Object in currentPageVosReference)
 			{
@@ -303,6 +334,20 @@ package com.sigmagroup.components
 			}
 		}
 		
+		private function addPreLoader():void
+		{
+			preLoader = new LoadingText();
+			preLoader.x = 440;
+			preLoader.y = 240;
+			addChild(preLoader);
+		}
+		
+		protected function removePreLoader():void
+		{
+			removeChild(preLoader);
+			preLoader = null;
+		}
+		
 		public function reAnimate(animateContentContainer:Boolean = true):void
 		{
 			VisualizerUtils.removeChildren(currentImagesContainer);
@@ -318,6 +363,16 @@ package com.sigmagroup.components
 				previousVO = currentVO;
 				currentVO = currentPageVosReference[currentSelected];
 			}
+		}
+		
+		protected function mouseOver(event:MouseEvent):void
+		{
+			event.currentTarget.gotoAndStop('over');
+		}
+		
+		protected function mouseOut(event:MouseEvent):void
+		{
+			event.currentTarget.gotoAndStop('out');
 		}
 		
 		//POTENTIALLY OVERIDDEN METHODS
@@ -378,11 +433,10 @@ package com.sigmagroup.components
 					currentImageHolder.addEventListener(MouseEvent.MOUSE_OUT, imageOutHandler);
 					currentImageHolder.addEventListener(MouseEvent.MOUSE_DOWN, imageDownHandler);
 					currentImagesContainer.addChild(currentImageHolder);
-					TweenLite.to(currentImageHolder,1, {alpha:1, delay:(.075*imageNumber)});
+					TweenLite.to(currentImageHolder,1, {alpha:1, delay:(.05*imageNumber)});
 					imageNumber++;
 				}
 			}
-			dispatchEvent(new Event(Event.COMPLETE));
 		}
 	}
 }
